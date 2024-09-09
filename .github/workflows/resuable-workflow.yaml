@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       package:
-        description: "Enter the technology (e.g., maven, generic, dev)"
+        description: "Enter the package (e.g., maven, generic, dev)"
         required: true
         type: string
       team:
@@ -39,6 +39,12 @@ jobs:
     #        ls -la
      #       mv master/config/repo/repo-mapping.json  ./
       #      ls -la 
+    - name: Get GitHub repository name dynamically
+      run: |
+        repo_full_name="${{ github.repository }}"  # This gives owner/repo
+        repo=$(echo $repo_full_name | cut -d'/' -f2)  # Extract just the repo part
+        echo "Repository name is: $repo"
+        echo "REPO_NAME=$repo" >> $GITHUB_ENV
 
     - name: Search for repository mapping in all JSON files using package
       run: |
