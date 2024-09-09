@@ -86,6 +86,7 @@ jobs:
 
     - name: Upload artifacts
       run : |
+        touch hello.txt
         jfrog_repo="${{ env.JFROG_REPO }}"
         team="${{ env.TEAM }}"
-        jf rt upload "repo-mapping.json" --repo=$jfrog_repo/$team/
+        jf rt upload "hello.txt" --repo=$jfrog_repo/$team/
