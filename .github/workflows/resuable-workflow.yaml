@@ -21,16 +21,20 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      
     - name: Checkout reusable workflow repository (to get config)
       uses: actions/checkout@v4
       with:
           repository: pacific-devops/resuable  
-          path: resuable
+          path: master
           fetch-depth: 1
     - name: Copy config file from reusable workflow
       run : |
-            mv resuable/config/repo-mapping.json  ./
+            ls -la
+            cd master
+            ls -la
+            mv master/config/repo-mapping.json  ./
             ls -la 
 
     - name: Get GitHub repository name dynamically from calling repo
