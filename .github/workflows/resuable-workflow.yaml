@@ -84,4 +84,4 @@ jobs:
         touch hello.txt
         jfrog_repo="${{ env.JFROG_REPO }}"
         team="${{ env.TEAM }}"
-        jf rt upload "hello.txt" --repo=$jfrog_repo/$team/
+        jf rt upload "hello.txt" --repo=$jfrog_repo --flat=false --target-path=$team/
