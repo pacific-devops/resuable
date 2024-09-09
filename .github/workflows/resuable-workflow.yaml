@@ -48,20 +48,25 @@ jobs:
         echo "Repository name is: $repo"
         echo "REPO_NAME=$repo" >> $GITHUB_ENV
         
-    - name: Read repository mapping file and determine JFrog repo based on domain and technology
+    - name: Read repository mapping file and determine JFrog repo based on technology
       id: read_mapping
       run: |
         repo="${{ env.REPO_NAME }}"
         technology="${{ inputs.technology }}"
-        domain="${{ inputs.domain }}"  # Get the domain input
+        team="${{ inputs.team }}"  # Get the team name input
 
-        # Read the mapping from the file and extract the relevant domain and JFrog repository
-        jfrog_repo=$(jq -r --arg repo "$repo" --arg domain "$domain" --arg tech "$technology" '.repositories[$repo].domains[$domain][$tech]' repo-mapping.json)
+        # Read the mapping from the file and extract the relevant JFrog repository for the given technology
+        domain=$(jq -r --arg repo "$repo" '.repositories[$repo].domain' repo-mapping.json)
+        jfrog_repo=$(jq -r --arg repo "$repo" --arg tech "$technology" '.repositories[$repo].technologies[$tech]' repo-mapping.json)
 
         if [[ "$jfrog_repo" == "null" ]]; then
-          echo "Repository $repo or domain $domain with technology $technology is not allowed to deploy. No mapping found."
+          echo "Repository $repo or technology $technology is not allowed to deploy. No mapping found."
           exit 1
         fi
 
-        echo "JFrog repository for $repo with domain $domain and technology $technology is $jfrog_repo"
+        echo "Domain for $repo is $domain"
+        echo "JFrog repository for $repo with technology $technology is $jfrog_repo"
+        echo "Team name is $team"
+        echo "DOMAIN=$domain" >> $GITHUB_ENV
         echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
+        echo "TEAM=$team" >> $GITHUB_ENV
