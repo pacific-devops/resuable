@@ -1,0 +1,18 @@
+{
+  "repositories": {
+    "third_repo": {
+      "domain": "third-domain",
+      "technologies": {
+        "maven": "third-domain-maven-local",
+        "generic": "third-domain-generic-local"
+      }
+    },
+    "fourth_repo": {
+      "domain": "fourth-domain",
+      "technologies": {
+        "maven": "fourth-domain-maven-local",
+        "generic": "fourth-domain-generic-local"
+      }
+    }
+  }
+}
