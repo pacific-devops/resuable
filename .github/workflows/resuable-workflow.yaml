@@ -3,7 +3,7 @@ name: Reusable Deployment Workflow
 on:
   workflow_call:
     inputs:
-      technology:
+      package:
         description: "Enter the technology (e.g., maven, generic, dev)"
         required: true
         type: string
@@ -40,29 +40,18 @@ jobs:
      #       mv master/config/repo/repo-mapping.json  ./
       #      ls -la 
 
-    - name: Get GitHub repository name dynamically from calling repo
-      id: get_repo_name
-      run: |
-        repo_full_name="${{ github.repository }}"  # This gives owner/repo
-        repo=$(echo $repo_full_name | cut -d'/' -f2)  # Extract just the repo part
-        echo "Repository name is: $repo"
-        echo "REPO_NAME=$repo" >> $GITHUB_ENV
-        
-    - name: Search for repository mapping in all JSON files in resuable/config/repo
-      id: read_mapping
+    - name: Search for repository mapping in all JSON files using package
       run: |
         repo="${{ env.REPO_NAME }}"
-        technology="${{ inputs.technology }}"
-        team="${{ inputs.team }}"  # Get the team name input
+        package="${{ inputs.package }}"
+        team="${{ inputs.team }}"
 
         found=false
 
-        # Loop through all JSON files in the resuable/config/repo folder
+        # Loop through all JSON files in the reusable/config/repo folder from the reusable workflow repository
         for file in master/config/repo/*.json; do
           echo "Searching in $file"
-          
-          # Try to find the repo mapping in the current file
-          jfrog_repo=$(jq -r --arg repo "$repo" --arg tech "$technology" '.repositories[$repo].technologies[$tech]' "$file")
+          jfrog_repo=$(jq -r --arg repo "$repo" --arg package "$package" '.repositories[$repo].packages[$package]' "$file")
           
           if [[ "$jfrog_repo" != "null" ]]; then
             found=true
@@ -72,11 +61,11 @@ jobs:
         done
 
         if [[ "$found" == "false" ]]; then
-          echo "Repository $repo or technology $technology is not allowed to deploy. No mapping found in any file."
+          echo "Repository $repo or package $package is not allowed to deploy. No mapping found in any file."
           exit 1
         fi
 
-        echo "JFrog repository for $repo with technology $technology is $jfrog_repo"
+        echo "JFrog repository for $repo with package $package is $jfrog_repo"
         echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
         echo "TEAM=$team" >> $GITHUB_ENV
     - name: JFrog Setup
