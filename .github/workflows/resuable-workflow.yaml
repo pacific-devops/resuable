@@ -70,3 +70,17 @@ jobs:
         echo "DOMAIN=$domain" >> $GITHUB_ENV
         echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
         echo "TEAM=$team" >> $GITHUB_ENV
+    - name: JFrog Setup
+      id: setup-cli
+      uses: jfrog/setup-jfrog-cli@v4.2.2
+      env:
+        JF_URL: ${{ vars.JF_URL }} # This should be the base URL of your Artifactory
+      with:
+        oidc-provider-name: gittest
+        oidc-audience: git-aud
+
+    - name: Upload artifacts
+      run : |
+        jfrog_repo="${{ env.JFROG_REPO }}"
+        team="${{ env.TEAM }}"
+        jf rt upload "repo-mapping.json" --repo=$jfrog_repo/$team/
