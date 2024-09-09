@@ -22,14 +22,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Checkout reusable workflow repository (to get release config)
+    - name: Checkout reusable workflow repository (to get config)
       uses: actions/checkout@v4
       with:
           repository: pacific-devops/resuable  
           path: resuable
           fetch-depth: 1
-    - name: Copy release config file from reusable workflow
-      if: env.COPY_REQUIRED == 'true'
+    - name: Copy config file from reusable workflow
       run : |
             mv resuable/config/repo-mapping.json  ./
             ls -la 
