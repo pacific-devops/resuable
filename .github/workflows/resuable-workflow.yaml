@@ -70,6 +70,11 @@ jobs:
         echo "DOMAIN=$domain" >> $GITHUB_ENV
         echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
         echo "TEAM=$team" >> $GITHUB_ENV
+
+  deploytest:
+    runs-on: ubuntu-latest
+    needs: [check-and-deploy]
+    steps:
     - name: JFrog Setup
       id: setup-cli
       uses: jfrog/setup-jfrog-cli@v4.2.2
