@@ -32,9 +32,7 @@ jobs:
     - name: Copy config file from reusable workflow
       run : |
             ls -la
-            #cd master
-            ls -la
-            mv master/config/repo-mapping.json  ./
+            mv master/config/repo/repo-mapping.json  ./
             ls -la 
 
     - name: Get GitHub repository name dynamically from calling repo
