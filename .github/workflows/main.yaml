@@ -16,7 +16,7 @@ jobs:
 
       # Step 2: Make sure the script has execute permissions
       - name: Make the script executable
-        run: chmod +x ./scripts/check_jfrog_repos.sh  # Adjust the path as needed
+        run: chmod +x ./config/repo/check_jfrog_repos.sh  # Adjust the path as needed
 
       # Step 3: Call the custom script to fetch and validate JFrog repositories
       - name: Fetch and validate allowed repositories
