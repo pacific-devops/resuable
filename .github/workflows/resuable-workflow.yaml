@@ -46,34 +46,41 @@ jobs:
         echo "Repository name is: $repo"
         echo "REPO_NAME=$repo" >> $GITHUB_ENV
 
-    - name: Search for repository mapping in all JSON files using package
+    - name: Validate repository, domain, and package
       run: |
         repo="${{ env.REPO_NAME }}"
         package="${{ inputs.package }}"
+        domain="${{ inputs.domain }}"
         team="${{ inputs.team }}"
 
-        found=false
+        # Check if the repo exists in the domain-mapping.json
+        repo_domain=$(jq -r --arg repo "$repo" '.repositories[$repo].domain' master/config/repo/domain-mapping.json)
 
-        # Loop through all JSON files in the reusable/config/repo folder from the reusable workflow repository
-        for file in master/config/repo/*.json; do
-          echo "Searching in $file"
-          jfrog_repo=$(jq -r --arg repo "$repo" --arg package "$package" '.repositories[$repo].packages[$package]' "$file")
-          
-          if [[ "$jfrog_repo" != "null" ]]; then
-            found=true
-            echo "Found JFrog repository in $file: $jfrog_repo"
-            break
-          fi
-        done
-
-        if [[ "$found" == "false" ]]; then
-          echo "Repository $repo or package $package is not allowed to deploy. No mapping found in any file."
+        # If repository is not found
+        if [[ "$repo_domain" == "" || "$repo_domain" == "null" ]]; then
+          echo "Repository $repo not found in the mapping file. No deployment allowed."
           exit 1
         fi
 
-        echo "JFrog repository for $repo with package $package is $jfrog_repo"
+        # If domain does not match the one provided
+        if [[ "$repo_domain" != "$domain" ]]; then
+          echo "Domain mismatch: expected $repo_domain, but received $domain for repository $repo. No deployment allowed."
+          exit 1
+        fi
+
+        # Check the package mapping for the given domain in package-mapping.json
+        jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domains[$domain][$package]' master/config/repo/package-mapping.json)
+        
+        # If the package is not found
+        if [[ "$jfrog_repo" == "null" || "$jfrog_repo" == "" ]]; then
+          echo "Package $package not found for domain $domain. No deployment allowed."
+          exit 1
+        fi
+
+        echo "JFrog repository for $domain and $package is $jfrog_repo"
         echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
         echo "TEAM=$team" >> $GITHUB_ENV
+        
     - name: JFrog Setup
       id: setup-cli
       uses: jfrog/setup-jfrog-cli@v4.2.2
