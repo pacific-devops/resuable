@@ -2,17 +2,9 @@
   "repositories": {
     "Hello_testing": {
       "domain": "dmagic",
-      "packages": {
-        "generic": "feature-testing-generic",
-        "docker": "docker-trial"
-      }
     },
     "another_repo": {
       "domain": "another-domain",
-      "packages": {
-        "maven": "another-domain-maven-local",
-        "generic": "another-domain-generic-local"
-      }
     }
   }
 }
