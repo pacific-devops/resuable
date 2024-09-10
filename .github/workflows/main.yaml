@@ -1,0 +1,42 @@
+name: JFrog Deployment Based on GitHub Custom Properties
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the GitHub repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Make sure the script has execute permissions
+      - name: Make the script executable
+        run: chmod +x ./scripts/check_jfrog_repos.sh  # Adjust the path as needed
+
+      # Step 3: Call the custom script to fetch and validate JFrog repositories
+      - name: Fetch and validate allowed repositories
+        id: fetch-properties
+        run: |
+          ./config/repo/check_jfrog_repos.sh "${{ secrets.GITHUB_TOKEN }}" "${{ github.repository }}"
+
+      # Step 4: Print allowed repositories from the environment variable
+      - name: Print allowed repositories
+        run: |
+          echo "Allowed repositories: $ALLOWED_REPOS"
+
+      # Step 5: Deploy artifacts to each allowed JFrog repo
+      - name: Deploy to all allowed JFrog repos
+        if: success()  # Only run if validation passed
+        run: |
+          echo "Starting deployment to all allowed JFrog repositories..."
+
+          # Deploy to each allowed JFrog repository
+          for repo in ${ALLOWED_REPOS[@]}; do
+            echo "Deploying to JFrog repository: $repo"
+            jf rt upload "artifacts/*" "$repo/" --url="${{ secrets.JFROG_URL }}" --apikey="${{ secrets.JFROG_API_KEY }}"
+          done
