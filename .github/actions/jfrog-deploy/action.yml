@@ -1,4 +1,4 @@
-name: "Reusable JFrog Deployment with Config Files"
+name: "Reusable JFrog Deployment with Config Files (Multiple Domains)"
 description: "Validate repo, domain, and package, then output JFrog repo and team."
 
 inputs:
@@ -25,7 +25,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: pacific-devops/resuable  # Adjust to your actual repository
-        path: master
+        path: master  # Adjust this path based on your folder structure
 
     - name: Get GitHub repository name dynamically
       run: |
@@ -34,7 +34,7 @@ runs:
         echo "REPO_NAME=$repo" >> $GITHUB_ENV
       shell: bash
 
-    - name: Check repository, domain, and package
+    - name: Check repository, domain, and package for multiple domains
       run: |
         repo="${{ env.REPO_NAME }}"
         package="${{ inputs.package }}"
@@ -45,15 +45,25 @@ runs:
         correct_domain=false
 
         echo "Searching for domain: $domain and package: $package in repo: $repo"
+
+        # Loop through all JSON files in the master/config/repo folder
         for file in master/config/repo/*.json; do
           echo "Searching in $file"
+
+          # Check if the repo exists in the current file (domain mapping)
           repo_domains=$(jq -r --arg repo "$repo" '.repositories[$repo].domains[]?' "$file")
+
           if [[ "$repo_domains" != "" && "$repo_domains" != "null" ]]; then
             echo "Found repository $repo in $file with domains: $repo_domains"
+
+            # Check if the domain matches any of the valid domains
             for mapped_domain in $repo_domains; do
               if [[ "$mapped_domain" == "$domain" ]]; then
                 echo "Domain matches: $mapped_domain"
+
+                # Check the package mapping for the given domain in package-mapping.json
                 jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domain[$domain][$package]?' master/config/repo/package-mapping.json)
+
                 if [[ "$jfrog_repo" != "null" && "$jfrog_repo" != "" ]]; then
                   found=true
                   correct_domain=true
@@ -80,6 +90,8 @@ runs:
         fi
 
         echo "JFrog repository for $domain and $package is $jfrog_repo"
-        echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
-        echo "TEAM=$team" >> $GITHUB_ENV
+        
+        # Set outputs using environment files
+        echo "jfrog_repo=$jfrog_repo" >> $GITHUB_OUTPUT
+        echo "team=$team" >> $GITHUB_OUTPUT
       shell: bash
