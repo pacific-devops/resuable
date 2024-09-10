@@ -1,8 +1,8 @@
 {
   "domain": {
     "dmagic": {
-      "docker": "docker-trial",
-      "generic": "feature-testing-generic"
+      "generic": "feature-testing-generic",
+      "docker": "docker-trial"
     },
     "run": {
       "maven": "fourth-domain-maven-local",
@@ -10,3 +10,4 @@
     }
   }
 }
+
