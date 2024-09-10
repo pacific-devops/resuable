@@ -12,6 +12,7 @@ inputs:
     description: "Enter the team name"
     required: true
 
+# Outputs must be explicitly defined here
 outputs:
   jfrog_repo:
     description: "JFrog repository to deploy to"
