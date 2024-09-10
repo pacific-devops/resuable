@@ -48,54 +48,61 @@ jobs:
 
     - name: Validate repository, domain, and package across all JSON files
       run: |
-        repo="${{ env.REPO_NAME }}"
-        package="${{ inputs.package }}"
-        domain="${{ inputs.domain }}"
-        team="${{ inputs.team }}"
+       repo="${{ env.REPO_NAME }}"
+       package="${{ inputs.package }}"
+       domain="${{ inputs.domain }}"
+       team="${{ inputs.team }}"
 
-        found=false
+       found=false
+       correct_domain=false
 
-        # Loop through all JSON files in the master/config/repo folder
-        for file in master/config/repo/*.json; do
-        echo "Searching in $file"
+       # Loop through all JSON files in the master/config/repo folder
+       for file in master/config/repo/*.json; do
+       echo "Searching in $file"
 
-        # Check if the repo exists in the current file
-        repo_domain=$(jq -r --arg repo "$repo" '.repositories[$repo].domain' "$file")
+       # Check if the repo exists in the current file (domain mapping)
+       repo_domain=$(jq -r --arg repo "$repo" '.repositories[$repo].domain' "$file")
 
-        # If the repository is found in the current file, proceed to domain check
-        if [[ "$repo_domain" != "" && "$repo_domain" != "null" ]]; then
+       if [[ "$repo_domain" != "" && "$repo_domain" != "null" ]]; then
+        echo "Found repository $repo in $file with domain $repo_domain"
 
         # Check if the domain matches
-        if [[ "$repo_domain" != "$domain" ]]; then
-          echo "Domain mismatch: expected $repo_domain, but received $domain for repository $repo in $file"
-          continue
-        fi
+        if [[ "$repo_domain" == "$domain" ]]; then
+          echo "Domain matches: $repo_domain"
 
-        # Check the package mapping for the given domain in package-mapping.json
-        jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domains[$domain][$package]' master/config/repo/package-mapping.json)
-        
-        # If the package is found, mark as found and break the loop
-        if [[ "$jfrog_repo" != "null" && "$jfrog_repo" != "" ]]; then
-          found=true
-          echo "Found JFrog repository for $repo and $package in $file: $jfrog_repo"
-          break
+          # Check the package mapping for the given domain in package-mapping.json
+          jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domain[$domain][$package]' master/config/repo/package-mapping.json)
+          
+          if [[ "$jfrog_repo" != "null" && "$jfrog_repo" != "" ]]; then
+            found=true
+            correct_domain=true
+            echo "Found JFrog repository for $repo with $package in $file: $jfrog_repo"
+            break
+          else
+            echo "Package $package not found for domain $domain in package-mapping.json"
+          fi
         else
-          echo "Package $package not found for domain $domain in $file"
+          echo "Domain mismatch: Expected $domain, found $repo_domain"
         fi
-         else
+       else
         echo "Repository $repo not found in $file"
-        fi
-        done
+       fi
+       done
 
-        # If the repository, domain, or package were not found in any file, exit with an error
-        if [[ "$found" == "false" ]]; then
-        echo "Repository $repo or package $package is not allowed to deploy. No mapping found in any file."
-        exit 1
-        fi
+       # If the repository, domain, or package were not found in any file, exit with an error
+       if [[ "$correct_domain" == "false" ]]; then
+        echo "Repository $repo was found, but domain does not match. Expected $domain, but found $repo_domain. No deployment allowed."
+       exit 1
+       fi
 
-        echo "JFrog repository for $domain and $package is $jfrog_repo"
-        echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
-        echo "TEAM=$team" >> $GITHUB_ENV
+       if [[ "$found" == "false" ]]; then
+       echo "Repository $repo or package $package is not allowed to deploy. No mapping found in any file."
+       exit 1
+       fi
+
+       echo "JFrog repository for $domain and $package is $jfrog_repo"
+       echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
+       echo "TEAM=$team" >> $GITHUB_ENV
         
     - name: JFrog Setup
       id: setup-cli
