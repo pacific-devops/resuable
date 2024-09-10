@@ -43,7 +43,7 @@ runs:
         echo "REPO_NAME=$repo" >> $GITHUB_ENV
       shell: bash
 
-    # Step 4: Validate repository, domain, and package
+    # Step 4: Validate repository, domain, and package for multiple mappings
     - name: Validate repository, domain, and package
       run: |
         repo="${{ env.REPO_NAME }}"
@@ -62,29 +62,29 @@ runs:
           echo "Searching in $file"
 
           # Check if the repo exists in the current file (domain mapping)
-          repo_domain=$(jq -r --arg repo "$repo" '.repositories[$repo].domain' "$file")
+          repo_domains=$(jq -r --arg repo "$repo" '.repositories[$repo].domains[]' "$file")
 
-          if [[ "$repo_domain" != "" && "$repo_domain" != "null" ]]; then
-            echo "Found repository $repo in $file with domain $repo_domain"
+          if [[ "$repo_domains" != "" && "$repo_domains" != "null" ]]; then
+            echo "Found repository $repo in $file with domains: $repo_domains"
 
-            # Check if the domain matches
-            if [[ "$repo_domain" == "$domain" ]]; then
-              echo "Domain matches: $repo_domain"
+            # Check if the domain matches any of the valid domains
+            for mapped_domain in $repo_domains; do
+              if [[ "$mapped_domain" == "$domain" ]]; then
+                echo "Domain matches: $mapped_domain"
 
-              # Check the package mapping for the given domain in package-mapping.json
-              jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domain[$domain][$package]' master/config/repo/package-mapping.json)
-              
-              if [[ "$jfrog_repo" != "null" && "$jfrog_repo" != "" ]]; then
-                found=true
-                correct_domain=true
-                echo "Found JFrog repository for $repo with $package in $file: $jfrog_repo"
-                break
-              else
-                echo "Package $package not found for domain $domain in package-mapping.json"
+                # Check the package mapping for the given domain in package-mapping.json
+                jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domain[$domain][$package]' master/config/repo/package-mapping.json)
+
+                if [[ "$jfrog_repo" != "null" && "$jfrog_repo" != "" ]]; then
+                  found=true
+                  correct_domain=true
+                  echo "Found JFrog repository for $repo with $package in $file: $jfrog_repo"
+                  break
+                else
+                  echo "Package $package not found for domain $domain in package-mapping.json"
+                fi
               fi
-            else
-              echo "Domain mismatch: Expected $domain, found $repo_domain"
-            fi
+            done
           else
             echo "Repository $repo not found in $file"
           fi
@@ -92,7 +92,7 @@ runs:
 
         # If the repository, domain, or package were not found in any file, exit with an error
         if [[ "$correct_domain" == "false" ]]; then
-          echo "Repository $repo was found, but domain does not match. Expected $domain, but found $repo_domain. No deployment allowed."
+          echo "Repository $repo was found, but domain does not match. No deployment allowed."
           exit 1
         fi
 
