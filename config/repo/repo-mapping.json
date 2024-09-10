@@ -1,11 +1,12 @@
 {
   "repositories": {
     "Hello_testing": {
-      "domain": "dmagic"
+      "domains": ["dmagic"]
     },
     "another_repo": {
-      "domain": "another-domain"
+      "domains": ["another-domain", "yet-another-domain"]
     }
   }
 }
+
 
