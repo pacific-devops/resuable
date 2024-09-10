@@ -21,10 +21,11 @@ echo "Custom properties found: $custom_properties"
 # Split the custom properties into an array (assuming they are separated by semicolons)
 allowed_repos=($(echo $custom_properties | tr ";" "\n"))
 
-# Output the allowed repositories for deployment
+# Output the allowed repositories for debugging
+echo "Allowed repositories:"
 for repo in "${allowed_repos[@]}"; do
-  echo "Allowed to deploy to: $repo"
+  echo "$repo"
 done
 
-# Return the allowed repositories for use in the workflow
+# Store the allowed repositories as a list in the environment variable
 echo "ALLOWED_REPOS=${allowed_repos[*]}" >> $GITHUB_ENV
