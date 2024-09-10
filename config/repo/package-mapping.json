@@ -1,0 +1,14 @@
+{
+  "dcrust": {
+    "dsale": {
+      "generic": "generic-local",
+      "docker": "gdap-dsale-docker-dev-local",
+      "maven": "gdap-dsale-maven-dev-local"
+    },
+    "run": {
+      "generic": "generic-dev-local",
+      "docker": "docker-dev-local",
+      "maven": "maven-dev-local"
+    },
+  }
+}
