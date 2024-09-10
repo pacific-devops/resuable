@@ -1,0 +1,92 @@
+name: "Reusable JFrog Deployment with Config Files"
+description: "Validate repo, domain, and package, then deploy artifacts to JFrog"
+
+inputs:
+  package:
+    description: "The package type (e.g., maven, generic, docker)"
+    required: true
+  domain:
+    description: "Enter the domain name"
+    required: true
+  team:
+    description: "Enter the team name"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  
+    # Step 1: Checkout the action repository to access config files
+    - name: Checkout action repository (to get config files)
+      uses: actions/checkout@v4
+      with:
+        repository: pacific-devops/resuable  # Your action repository name here
+        path: master  # Path where it will be checked ou
+  
+    # Step 2: Get GitHub repository name dynamically
+    - name: Get GitHub repository name dynamically
+      shell: bash
+      run: |
+        repo_full_name="${{ github.repository }}"
+        repo=$(echo $repo_full_name | cut -d'/' -f2)
+        echo "REPO_NAME=$repo" >> $GITHUB_ENV
+
+    # Step 3: Validate repository, domain, and package across all JSON files
+    - name: Validate repository, domain, and package
+      shell: bash
+      run: |
+        repo="${{ env.REPO_NAME }}"
+        package="${{ inputs.package }}"
+        domain="${{ inputs.domain }}"
+        team="${{ inputs.team }}"
+
+        found=false
+        correct_domain=false
+
+        # Loop through all JSON files in the master/config/repo folder
+        for file in master/config/repo/*.json; do
+          echo "Searching in $file"
+
+          # Check if the repo exists in the current file (domain mapping)
+          repo_domain=$(jq -r --arg repo "$repo" '.repositories[$repo].domain' "$file")
+
+          if [[ "$repo_domain" != "" && "$repo_domain" != "null" ]]; then
+            echo "Found repository $repo in $file with domain $repo_domain"
+
+            # Check if the domain matches
+            if [[ "$repo_domain" == "$domain" ]]; then
+              echo "Domain matches: $repo_domain"
+
+              # Check the package mapping for the given domain in package-mapping.json
+              jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domains[$domain][$package]' master/config/repo/package-mapping.json)
+              
+              if [[ "$jfrog_repo" != "null" && "$jfrog_repo" != "" ]]; then
+                found=true
+                correct_domain=true
+                echo "Found JFrog repository for $repo with $package in $file: $jfrog_repo"
+                break
+              else
+                echo "Package $package not found for domain $domain in package-mapping.json"
+              fi
+            else
+              echo "Domain mismatch: Expected $domain, found $repo_domain"
+            fi
+          else
+            echo "Repository $repo not found in $file"
+          fi
+        done
+
+        # If the repository, domain, or package were not found in any file, exit with an error
+        if [[ "$correct_domain" == "false" ]]; then
+          echo "Repository $repo was found, but domain does not match. Expected $domain, but found $repo_domain. No deployment allowed."
+          exit 1
+        fi
+
+        if [[ "$found" == "false" ]]; then
+          echo "Repository $repo or package $package is not allowed to deploy. No mapping found in any file."
+          exit 1
+        fi
+
+        echo "JFrog repository for $domain and $package is $jfrog_repo"
+        echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
+        echo "TEAM=$team" >> $GITHUB_ENV
