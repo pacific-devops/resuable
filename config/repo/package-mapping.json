@@ -1,14 +1,12 @@
 {
-  "dcrust": {
-    "dsale": {
-      "generic": "generic-local",
-      "docker": "gdap-dsale-docker-dev-local",
-      "maven": "gdap-dsale-maven-dev-local"
-    },
+  "domain": {
+    "dmagic": {
+        "docker": "docker-trial",
+        "generic": "feature-testing-generic"
+      },
     "run": {
-      "generic": "generic-dev-local",
-      "docker": "docker-dev-local",
-      "maven": "maven-dev-local"
-    },
+        "maven": "fourth-domain-maven-local",
+        "generic": "fourth-domain-generic-local"
+      }
   }
 }
