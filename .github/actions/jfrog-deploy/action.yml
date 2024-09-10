@@ -26,14 +26,14 @@ runs:
     - name: Checkout action repository (to get config files)
       uses: actions/checkout@v4
       with:
-        repository: pacific-devops/resuable
+        repository: pacific-devops/resuable  # Adjust to your actual repository
         path: master  # Adjust this path based on your folder structure
 
     # Step 2: List the files to ensure config files are present
     - name: List files for debugging
       run: |
         ls -la master/config/repo/
-      shell: bash  # Explicitly specifying the shell
+      shell: bash
 
     # Step 3: Get GitHub repository name dynamically
     - name: Get GitHub repository name dynamically
@@ -41,7 +41,7 @@ runs:
         repo_full_name="${{ github.repository }}"
         repo=$(echo $repo_full_name | cut -d'/' -f2)
         echo "REPO_NAME=$repo" >> $GITHUB_ENV
-      shell: bash  # Explicitly specifying the shell
+      shell: bash
 
     # Step 4: Validate repository, domain, and package
     - name: Validate repository, domain, and package
@@ -72,7 +72,7 @@ runs:
               echo "Domain matches: $repo_domain"
 
               # Check the package mapping for the given domain in package-mapping.json
-              jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domains[$domain][$package]' master/config/repo/package-mapping.json)
+              jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domain[$domain][$package]' master/config/repo/package-mapping.json)
               
               if [[ "$jfrog_repo" != "null" && "$jfrog_repo" != "" ]]; then
                 found=true
@@ -104,4 +104,4 @@ runs:
         echo "JFrog repository for $domain and $package is $jfrog_repo"
         echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
         echo "TEAM=$team" >> $GITHUB_ENV
-      shell: bash  # Explicitly specifying the shell
+      shell: bash
