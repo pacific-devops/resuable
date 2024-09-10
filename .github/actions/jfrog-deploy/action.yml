@@ -22,7 +22,7 @@ runs:
   using: "composite"
   steps:
   
-    # Step 1: Checkout action repository (to get config files)
+    # Step 1: Checkout the action repository (to get config files)
     - name: Checkout action repository (to get config files)
       uses: actions/checkout@v4
       with:
@@ -33,18 +33,18 @@ runs:
     - name: List files for debugging
       run: |
         ls -la master/config/repo/
+      shell: bash  # Explicitly specifying the shell
 
     # Step 3: Get GitHub repository name dynamically
     - name: Get GitHub repository name dynamically
-      shell: bash
       run: |
         repo_full_name="${{ github.repository }}"
         repo=$(echo $repo_full_name | cut -d'/' -f2)
         echo "REPO_NAME=$repo" >> $GITHUB_ENV
+      shell: bash  # Explicitly specifying the shell
 
     # Step 4: Validate repository, domain, and package
     - name: Validate repository, domain, and package
-      shell: bash
       run: |
         repo="${{ env.REPO_NAME }}"
         package="${{ inputs.package }}"
@@ -104,3 +104,4 @@ runs:
         echo "JFrog repository for $domain and $package is $jfrog_repo"
         echo "JFROG_REPO=$jfrog_repo" >> $GITHUB_ENV
         echo "TEAM=$team" >> $GITHUB_ENV
+      shell: bash  # Explicitly specifying the shell
