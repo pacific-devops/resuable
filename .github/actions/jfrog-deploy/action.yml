@@ -62,7 +62,7 @@ runs:
           echo "Searching in $file"
 
           # Check if the repo exists in the current file (domain mapping)
-          repo_domains=$(jq -r --arg repo "$repo" '.repositories[$repo].domains[]' "$file")
+          repo_domains=$(jq -r --arg repo "$repo" '.repositories[$repo].domains[]?' "$file")
 
           if [[ "$repo_domains" != "" && "$repo_domains" != "null" ]]; then
             echo "Found repository $repo in $file with domains: $repo_domains"
@@ -73,7 +73,7 @@ runs:
                 echo "Domain matches: $mapped_domain"
 
                 # Check the package mapping for the given domain in package-mapping.json
-                jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domain[$domain][$package]' master/config/repo/package-mapping.json)
+                jfrog_repo=$(jq -r --arg domain "$domain" --arg package "$package" '.domain[$domain][$package]?' master/config/repo/package-mapping.json)
 
                 if [[ "$jfrog_repo" != "null" && "$jfrog_repo" != "" ]]; then
                   found=true
@@ -92,7 +92,7 @@ runs:
 
         # If the repository, domain, or package were not found in any file, exit with an error
         if [[ "$correct_domain" == "false" ]]; then
-          echo "Repository $repo was found, but domain does not match. No deployment allowed."
+          echo "Repository $repo was found, but domain does not match any valid mappings. No deployment allowed."
           exit 1
         fi
 
