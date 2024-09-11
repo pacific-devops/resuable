@@ -22,7 +22,7 @@ jobs:
 
     - name: Fetch custom properties and write to output
       id: fetch-custom-properties
-      run: python ./path-to-script/fetch_custom_properties.py
+      run: python ./config/repo/check_jfrog.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token to authenticate API requests
         INPUT_DESTINATION_REPO: 'feature-testing-generic'  # Example input (user-defined repo)
