@@ -1,7 +1,7 @@
 name: JFrog Deployment with Dynamic Custom Properties
 
 on:
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   check-and-deploy:
