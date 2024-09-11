@@ -1,44 +1,35 @@
-name: JFrog Deployment with Python Validation
+name: JFrog Deployment with Dynamic Custom Properties
 
 on:
   workflow_dispatch:
-    inputs:
-      destination_repo:
-        description: 'JFrog repository to deploy to (user input)'
-        required: true
 
 jobs:
   check-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the GitHub repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      # Step 2: Set up Python environment
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
 
-      # Step 3: Install dependencies (if any)
-      - name: Install dependencies
-        run: |
-          pip install requests
+    - name: Install dependencies (if needed)
+      run: |
+        python -m pip install requests
 
-      # Step 4: Fetch and validate using Python script
-      - name: Fetch and validate allowed repositories
-        id: fetch-properties
-        run: |
-          python ./config/repo/check_jfrog_repos.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INPUT_DESTINATION_REPO: ${{ github.event.inputs.destination_repo }}  # Pass the user input repo
+    - name: Fetch and validate custom properties
+      id: fetch-custom-properties
+      run: python ./config/repo/check_jfrog_repos.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token to authenticate API requests
+        INPUT_DESTINATION_REPO: 'feature-testing-generic'  # Example input (user-defined repo)
+        INPUT_CUSTOM_PROPERTY: 'jfrog_repo'  # Custom property to fetch from the GitHub repo
 
-      # Step 5: Deploy artifacts to JFrog if validation passed
-      - name: Upload artifacts to JFrog
-        if: success()  # Only run if the validation passed
-        run: |
-          echo "Deploying to JFrog repository: ${{ steps.fetch-properties.outputs.jfrog_repo }}"
-          jf rt upload "artifacts/*" "${{ steps.fetch-properties.outputs.jfrog_repo }}/" --url="${{ secrets.JFROG_URL }}" --apikey="${{ secrets.JFROG_API_KEY }}"
+    - name: Deploy to JFrog
+      if: success()  # Run this only if the previous step succeeded
+      run: |
+        echo "Deploying to ${{ steps.fetch-custom-properties.outputs.allowed_repo }}"
+        # Add your JFrog CLI upload command here using ${{ steps.fetch-custom-properties.outputs.allowed_repo }}
