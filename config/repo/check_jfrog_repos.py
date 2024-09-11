@@ -2,7 +2,7 @@ import os
 import requests
 import sys
 
-# Fetch environment variables (set in the GitHub Action or CI pipeline)
+# Fetch environment variables
 github_token = os.getenv('GITHUB_TOKEN')
 repo_name = os.getenv('GITHUB_REPOSITORY')  # The repository from which we fetch custom properties
 destination_repo = os.getenv('INPUT_DESTINATION_REPO')  # User input for the target repo (e.g., JFrog repo)
@@ -35,27 +35,39 @@ if not custom_property:
     sys.exit(1)
 
 # Case 1: If the custom property is 'jfrog_repo_mapping', compare with user input
-if custom_property_name == 'jfrog_repo_mapping':
-    # Assuming the custom property is a semicolon-separated list (e.g., "repo1;repo2;repo3")
+if custom_property_name == 'jfrog_repo':
     allowed_repos = [repo.strip() for repo in custom_property.split(";")]
-    print(f"Allowed repositories based on {custom_property_name}: {allowed_repos}")
 
-    # Compare the user-provided destination repository with the allowed repositories
     if destination_repo in allowed_repos:
         print(f"The repository {destination_repo} is allowed.")
-        # Set outputs for the next step (e.g., deployment) by writing to the GitHub output file
-        with open(os.getenv('GITHUB_OUTPUT'), 'a') as output_file:
-            output_file.write(f"allowed_repo={destination_repo}\n")
+        
+        # Debugging: Check if GITHUB_OUTPUT is available
+        github_output_path = os.getenv('GITHUB_OUTPUT')
+        print(f"GITHUB_OUTPUT path: {github_output_path}")
+        
+        if github_output_path:
+            with open(github_output_path, 'a') as output_file:
+                output_file.write(f"allowed_repo={destination_repo}\n")
+        else:
+            print("GITHUB_OUTPUT is not set. Cannot write output.")
+            sys.exit(1)
+
     else:
         print(f"The repository {destination_repo} is not allowed. Aborting.")
         sys.exit(1)
 
 # Case 2: For other custom properties, print the property in a list format
 else:
-    # Assuming the custom property is a semicolon-separated list (if multiple values)
     property_values = [value.strip() for value in custom_property.split(";")]
     print(f"Custom Property ({custom_property_name}): {property_values}")
 
-    # Set outputs (optional) so that these values can be used in the GitHub workflow
-    with open(os.getenv('GITHUB_OUTPUT'), 'a') as output_file:
-        output_file.write(f"{custom_property_name}={property_values}\n")
+    # Debugging: Check if GITHUB_OUTPUT is available
+    github_output_path = os.getenv('GITHUB_OUTPUT')
+    print(f"GITHUB_OUTPUT path: {github_output_path}")
+
+    if github_output_path:
+        with open(github_output_path, 'a') as output_file:
+            output_file.write(f"{custom_property_name}={property_values}\n")
+    else:
+        print("GITHUB_OUTPUT is not set. Cannot write output.")
+        sys.exit(1)
