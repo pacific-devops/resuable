@@ -31,7 +31,7 @@ jobs:
       - name: Fetch and validate allowed repositories
         id: fetch-properties
         run: |
-          python ./scripts/check_jfrog_repos.py
+          python ./config/repo/check_jfrog_repos.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_DESTINATION_REPO: ${{ github.event.inputs.destination_repo }}  # Pass the user input repo
