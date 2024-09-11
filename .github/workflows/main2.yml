@@ -2,6 +2,10 @@ name: JFrog Deployment with Custom Properties and List Checking
 
 on:
   workflow_dispatch:
+    inputs:
+      destination_repo:
+        description: 'Enter the destination repository (e.g., feature-testing-generic)'
+        required: true
 
 jobs:
   check-and-deploy:
@@ -25,7 +29,7 @@ jobs:
       run: python ./config/repo/check_jfrog.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token to authenticate API requests
-        INPUT_DESTINATION_REPO: 'feature-testing-generic'  # Example input (user-defined repo)
+        INPUT_DESTINATION_REPO: ${{ inputs.destination_repo }}  # Dynamic input for destination repo
         INPUT_CUSTOM_PROPERTY: 'jfrog_repo'  # Custom property to fetch from the GitHub repo
 
     - name: Check if the destination repo is in the allowed list
@@ -37,7 +41,7 @@ jobs:
         IFS=',' read -r -a repo_array <<< "$allowed_repos"
 
         # User-provided destination repository
-        destination_repo="feature-testing-generic"
+        destination_repo="${{ inputs.destination_repo }}"
 
         # Check if the destination repo is in the list of allowed repos
         if [[ " ${repo_array[@]} " =~ " ${destination_repo} " ]]; then
