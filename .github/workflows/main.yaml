@@ -1,4 +1,4 @@
-name: JFrog Deployment with User Input Validation
+name: JFrog Deployment with Python Validation
 
 on:
   workflow_dispatch:
@@ -16,33 +16,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Make the script executable
-      - name: Make the script executable
-        run: chmod +x ./config/repo/check_jfrog_repos.sh
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
-      # Step 3: Call the custom script to fetch and validate allowed JFrog repositories
+      # Step 3: Install dependencies (if any)
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      # Step 4: Fetch and validate using Python script
       - name: Fetch and validate allowed repositories
         id: fetch-properties
         run: |
-          ./config/repo/check_jfrog_repos.sh "${{ secrets.GITHUB_TOKEN }}" "${{ github.repository }}"
+          python ./scripts/check_jfrog_repos.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_DESTINATION_REPO: ${{ github.event.inputs.destination_repo }}  # Pass the user input repo
 
-      # Step 4: Validate the destination repository provided by the user
-      - name: Validate user-provided destination repository
-        run: |
-          # Get the destination repository from the workflow input
-          destination_repo="${{ github.event.inputs.destination_repo }}"
-          
-          # Check if the destination_repo is in the allowed repositories list
-          if [[ " ${ALLOWED_REPOS[@]} " =~ " ${destination_repo} " ]]; then
-            echo "The repository $destination_repo is allowed."
-          else
-            echo "The repository $destination_repo is not allowed. Aborting."
-            exit 1
-          fi
-
-      # Step 5: Upload artifacts to JFrog if validation passed
+      # Step 5: Deploy artifacts to JFrog if validation passed
       - name: Upload artifacts to JFrog
         if: success()  # Only run if the validation passed
         run: |
-          echo "Deploying to JFrog repository: ${{ github.event.inputs.destination_repo }}"
-          jf rt upload "artifacts/*" "${{ github.event.inputs.destination_repo }}/" --url="${{ secrets.JFROG_URL }}" --apikey="${{ secrets.JFROG_API_KEY }}"
+          echo "Deploying to JFrog repository: ${{ steps.fetch-properties.outputs.jfrog_repo }}"
+          jf rt upload "artifacts/*" "${{ steps.fetch-properties.outputs.jfrog_repo }}/" --url="${{ secrets.JFROG_URL }}" --apikey="${{ secrets.JFROG_API_KEY }}"
