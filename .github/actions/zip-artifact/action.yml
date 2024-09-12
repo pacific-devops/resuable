@@ -1,0 +1,23 @@
+name: 'Zip Artifact'
+description: 'Zip artifacts using the provided version number'
+inputs:
+  source:
+    description: 'The path to the folder or file to zip'
+    required: true
+  destination:
+    description: 'The path to save the zipped artifact'
+    required: true
+  version:
+    description: 'The version number to include in the artifact name'
+    required: true
+outputs:
+  zip_path:
+    description: 'The path to the zipped artifact'
+runs:
+  using: 'composite'
+  steps:
+    - name: Zip the artifact
+      run: |
+        zip_name="${{ inputs.destination }}/artifact-${{ inputs.version }}.zip"
+        zip -r $zip_name ${{ inputs.source }}
+        echo "zip_path=$zip_name" >> $GITHUB_OUTPUT
