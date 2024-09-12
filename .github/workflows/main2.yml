@@ -7,7 +7,7 @@ on:
         description: 'Enter the destination repository (e.g., feature-testing-generic)'
         required: true
 env:
- destination_repo: 'feature-testing-generic'
+ destination_repos: '${{inputs.destination_repo}}'
 
 jobs:
   check-and-deploy:
@@ -38,10 +38,10 @@ jobs:
         allowed_repos="${{ steps.fetch-custom-properties.outputs.jfrog_repo }}"
         echo "Allowed Repositories: $allowed_repos"
          # Check if the destination repo is in the list of allowed repos
-         if echo "$allowed_repos" | grep -q "${{env.destination_repo}}"; then
-         echo "The repository ${{env.destination_repo}} is allowed."
+         if echo "$allowed_repos" | grep -q "${{env.destination_repos}}"; then
+         echo "The repository ${{env.destination_repos}} is allowed."
          else
-         echo "The repository ${{env.destination_repo}} is not allowed. Aborting."
+         echo "The repository ${{env.destination_repos}} is not allowed. Aborting."
          exit 1
          fi
 
