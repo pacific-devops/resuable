@@ -30,11 +30,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token to authenticate API requests
         INPUT_DESTINATION_REPO: ${{ inputs.destination_repo }}  # Dynamic input for destination repo
-        INPUT_CUSTOM_PROPERTY: 'jfrog_repo'  # Custom property to fetch from the GitHub repo
+        INPUT_CUSTOM_PROPERTY: jfrog_repo  # Dynamic input for custom property name
 
     - name: Check if the destination repo is in the allowed list
       run: |
-        allowed_repos="${{ steps.fetch-custom-properties.outputs.allowed_repos }}"
+        allowed_repos="${{ steps.fetch-custom-properties.outputs.${{ inputs.custom_property_name }} }}"
         echo "Allowed Repositories: $allowed_repos"
 
         # Convert the comma-separated string back to an array
@@ -46,7 +46,7 @@ jobs:
         # Check if the destination repo is in the list of allowed repos
         if [[ " ${repo_array[@]} " =~ " ${destination_repo} " ]]; then
           echo "The repository $destination_repo is allowed."
-        else
+        else:
           echo "The repository $destination_repo is not allowed. Aborting."
           exit 1
         fi
