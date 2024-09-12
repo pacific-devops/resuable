@@ -34,7 +34,7 @@ jobs:
 
     - name: Check if the destination repo is in the allowed list
       run: |
-        allowed_repos="${{ steps.fetch-custom-properties.outputs.${{ inputs.custom_property_name }} }}"
+        allowed_repos="${{ steps.fetch-custom-properties.outputs.jfrog_repo }}"
         echo "Allowed Repositories: $allowed_repos"
 
         # Convert the comma-separated string back to an array
