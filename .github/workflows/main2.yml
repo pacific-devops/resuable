@@ -31,7 +31,7 @@ jobs:
       run: python ./config/repo/check_jfrog.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token to authenticate API requests
-        INPUT_CUSTOM_PROPERTY: jfrog_repo  # Dynamic input for custom property
+        INPUT_CUSTOM_PROPERTY: domain  # Dynamic input for custom property
 
     - name: Check if the destination repo is in the allowed list
       run: |
