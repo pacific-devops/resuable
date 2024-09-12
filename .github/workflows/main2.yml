@@ -46,7 +46,7 @@ jobs:
         # Check if the destination repo is in the list of allowed repos
         if [[ " ${repo_array[@]} " =~ " ${destination_repo} " ]]; then
           echo "The repository $destination_repo is allowed."
-        else:
+        else
           echo "The repository $destination_repo is not allowed. Aborting."
           exit 1
         fi
