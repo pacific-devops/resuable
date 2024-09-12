@@ -5,12 +5,13 @@ on:
     outputs:
       version:
         description: 'Generated version number'
+        value: ${{ jobs.generate_version.outputs.version }}  # Correct value reference
 
 jobs:
   generate_version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version_output.outputs.version }}
+      version: ${{ steps.version_output.outputs.version }}  # This references the output of the step
     steps:
       - name: Generate version
         id: version_output
