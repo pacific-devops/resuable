@@ -17,6 +17,7 @@ runs:
   using: 'composite'
   steps:
     - name: Zip the artifact
+      shell: bash
       run: |
         zip_name="${{ inputs.destination }}/artifact-${{ inputs.version }}.zip"
         zip -r $zip_name ${{ inputs.source }}
