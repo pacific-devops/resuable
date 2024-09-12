@@ -1,0 +1,20 @@
+name: 'Zip Artifact'
+description: 'A composite action to zip artifacts'
+inputs:
+  source:
+    description: 'The path to the folder or file to zip'
+    required: true
+  destination:
+    description: 'The path to save the zipped artifact'
+    required: true
+outputs:
+  zip_path:
+    description: 'The path to the zipped artifact'
+runs:
+  using: 'composite'
+  steps:
+    - name: Zip the artifact
+      run: |
+        zip -r ${{ inputs.destination }} ${{ inputs.source }}
+        echo "zip_path=${{ inputs.destination }}" >> $GITHUB_OUTPUT
+
