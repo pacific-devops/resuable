@@ -26,7 +26,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token to authenticate API requests
         INPUT_DESTINATION_REPO: 'feature-testing-generic'  # Example input (user-defined repo)
-        INPUT_CUSTOM_PROPERTY: 'jfrog_repo'  # Custom property to fetch from the GitHub repo
+        INPUT_CUSTOM_PROPERTY: 'domain'  # Custom property to fetch from the GitHub repo
 
     - name: Deploy to JFrog
       if: success()  # Run this only if the previous step succeeded
