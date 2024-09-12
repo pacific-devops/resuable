@@ -22,7 +22,7 @@ jobs:
         id: zip_step
         uses: ./.github/actions/zip-artifact
         with:
-          source: './folder-to-zip'
+          source: './config'
           destination: './artifacts'
           version: ${{ needs.generate-version.outputs.version }}
 
