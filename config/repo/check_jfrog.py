@@ -7,7 +7,6 @@ def main():
     # Fetch environment variables
     github_token = os.getenv('GITHUB_TOKEN')
     repo_name = os.getenv('GITHUB_REPOSITORY')  # The repository from which we fetch custom properties
-    destination_repo = os.getenv('INPUT_DESTINATION_REPO')  # User input for the target repo (e.g., JFrog repo)
     custom_property_name = os.getenv('INPUT_CUSTOM_PROPERTY')  # The specific custom property the user wants to fetch
 
     if not github_token or not repo_name or not custom_property_name:
@@ -40,24 +39,17 @@ def main():
         print(f"No custom property found for '{custom_property_name}'. Aborting.")
         sys.exit(1)
 
-    # Assume the custom property is a semicolon-separated list (e.g., "repo1;repo2;repo3")
-    allowed_repos = [repo.strip() for repo in custom_property.split(";")]
-    print(f"Allowed repositories based on {custom_property_name}: {allowed_repos}")
-
-    # Check if the destination repo is in the allowed repos
-    if destination_repo in allowed_repos:
-        print(f"The repository {destination_repo} is allowed.")
-    else:
-        print(f"The repository {destination_repo} is not allowed. Aborting.")
-        sys.exit(1)
+    # Assume the custom property is a semicolon-separated list (e.g., "value1;value2;value3")
+    property_values = [value.strip() for value in custom_property.split(";")]
+    print(f"Custom property values based on {custom_property_name}: {property_values}")
 
     # Write the list to GitHub output for use in the workflow
-    allowed_repos_str = ",".join(allowed_repos)  # Convert list to comma-separated string
+    property_values_str = ",".join(property_values)  # Convert list to comma-separated string
     github_output_path = os.getenv('GITHUB_OUTPUT')
 
     if github_output_path:
         with open(github_output_path, 'a', encoding='utf-8') as output_file:
-            output_file.write(f"{custom_property_name}={allowed_repos_str}\n")
+            output_file.write(f"{custom_property_name}={property_values_str}\n")
     else:
         print("GITHUB_OUTPUT is not set. Cannot write output.")
         sys.exit(1)
