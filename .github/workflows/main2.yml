@@ -6,6 +6,8 @@ on:
       destination_repo:
         description: 'Enter the destination repository (e.g., feature-testing-generic)'
         required: true
+env:
+ destination_repo: 'feature-testing-generic'
 
 jobs:
   check-and-deploy:
@@ -35,20 +37,13 @@ jobs:
       run: |
         allowed_repos="${{ steps.fetch-custom-properties.outputs.jfrog_repo }}"
         echo "Allowed Repositories: $allowed_repos"
-
-        # Convert the comma-separated string back to an array
-        IFS=',' read -r -a repo_array <<< "$allowed_repos"
-
-        # User-provided destination repository
-        destination_repo="${{ inputs.destination_repo }}"
-
-        # Check if the destination repo is in the list of allowed repos
-        if [[ " ${repo_array[@]} " =~ " ${destination_repo} " ]]; then
-          echo "The repository $destination_repo is allowed."
-        else
-          echo "The repository $destination_repo is not allowed. Aborting."
-          exit 1
-        fi
+         # Check if the destination repo is in the list of allowed repos
+         if echo "$allowed_repos" | grep -q "${{env.destination_repo}}"; then
+         echo "The repository ${{env.destination_repo}} is allowed."
+         else
+         echo "The repository ${{env.destination_repo}} is not allowed. Aborting."
+         exit 1
+         fi
 
     - name: Deploy to JFrog
       if: success()  # Run this only if the previous step succeeded
