@@ -15,7 +15,7 @@ jobs:
       # Step 1: Call reusable version workflow
       - name: Generate version
         id: version_step
-        uses: ./.github/workflows/reusable-version.yml
+        uses: pacific-devops/resuable/.github/workflows/resuable-version.yml@main
 
       # Step 2: Use composite action to zip artifact
       - name: Zip artifact with version
