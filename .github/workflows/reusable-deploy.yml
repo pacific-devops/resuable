@@ -1,0 +1,31 @@
+name: 'Deploy Artifact'
+
+on:
+  workflow_call:
+    inputs:
+      zip_path:
+          description: 'Path to the zipped artifact'
+          type: string
+          required: true
+      destination_repo:
+           description: 'The destination repository to deploy to'
+           type: string
+           required: true
+
+jobs:
+  deploy_artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if destination repo is allowed
+        run: |
+          allowed_repo="my-allowed-repo"
+          if [ "${{ inputs.destination_repo }}" != "$allowed_repo" ]; then
+            echo "The repository is not allowed to deploy."
+            exit 1
+          else
+            echo "Repository is allowed to deploy."
+          fi
+
+      - name: Deploy the artifact
+        run: |
+          echo "Deploying artifact ${{ inputs.zip_path }} to ${{ inputs.destination_repo }}."
