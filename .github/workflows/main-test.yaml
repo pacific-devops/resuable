@@ -24,12 +24,12 @@ jobs:
         with:
           source: './folder-to-zip'
           destination: './artifacts'
-          version: ${{ jobs.generate-version.outputs.version }}
+          version: ${{ needs.generate-version.outputs.version }}
 
   # Step 3: Call reusable deploy workflow
   deploy-artifact:
     needs: zip-artifact
     uses: pacific-devops/resuable/.github/workflows/reusable-deploy.yml@main
     with:
-      zip_path: ${{ jobs.zip-artifact.outputs.zip_path }}
+      zip_path: ${{ needs.zip-artifact.outputs.zip_path }}
       destination_repo: 'my-allowed-repo'
