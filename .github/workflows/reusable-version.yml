@@ -1,0 +1,19 @@
+name: 'Generate Version Workflow'
+
+on:
+  workflow_call:
+    outputs:
+      version:
+        description: 'Generated version number'
+
+jobs:
+  generate_version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version_output.outputs.version }}
+    steps:
+      - name: Generate version
+        id: version_output
+        run: |
+          VERSION="1.0.$(date +%s)"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
