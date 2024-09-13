@@ -19,6 +19,6 @@ runs:
     - name: Zip the artifact
       shell: bash
       run: |
-        zip_name="${{ inputs.destination }}/artifact-${{ inputs.version }}.zip"
+        zip_name="artifact-${{ inputs.version }}.zip"
         zip -r $zip_name ${{ inputs.source }}
         echo "zip_path=$zip_name" >> $GITHUB_OUTPUT
