@@ -13,10 +13,12 @@ inputs:
 outputs:
   zip_path:
     description: 'The path to the zipped artifact'
+    value: ${{ steps.zip_step.outputs.zip_path }}  # Define the value properly
 runs:
   using: 'composite'
   steps:
     - name: Zip the artifact
+      id: zip_step
       shell: bash
       run: |
         zip_name="artifact-${{ inputs.version }}.zip"  # Create the zip file in the current directory
