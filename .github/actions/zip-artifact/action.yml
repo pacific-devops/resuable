@@ -5,7 +5,7 @@ inputs:
     description: 'The path to the folder or file to zip'
     required: true
   destination:
-    description: 'The path to save the zipped artifact'
+    description: 'The name of the zip file to be created'
     required: true
   version:
     description: 'The version number to include in the artifact name'
@@ -19,6 +19,10 @@ runs:
     - name: Zip the artifact
       shell: bash
       run: |
-        zip_name="artifact-${{ inputs.version }}.zip"
-        zip -r $zip_name ${{ inputs.source }}
-        echo "zip_path=$zip_name" >> $GITHUB_OUTPUT
+        zip_name="artifact-${{ inputs.version }}.zip"  # Create the zip file in the current directory
+        zip -r $zip_name ${{ inputs.source }}          # Zip the source directory into the current directory
+        echo "zip_path=$zip_name" >> $GITHUB_OUTPUT    # Set the output for zip_path
+
+    - name: Debug
+      shell: bash
+      run: ls -la
