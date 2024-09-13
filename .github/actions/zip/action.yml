@@ -17,4 +17,3 @@ runs:
       run: |
         zip -r ${{ inputs.destination }} ${{ inputs.source }}
         echo "zip_path=${{ inputs.destination }}" >> $GITHUB_OUTPUT
-
