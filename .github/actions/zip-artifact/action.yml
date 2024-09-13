@@ -12,7 +12,6 @@ inputs:
     required: true
 outputs:
   zip_path:
-    required: true
     description: 'The path to the zipped artifact'
 runs:
   using: 'composite'
