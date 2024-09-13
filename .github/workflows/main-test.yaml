@@ -14,6 +14,8 @@ jobs:
   zip-artifact:
     runs-on: ubuntu-latest
     needs: generate-version
+    outputs:
+      zip_path: ${{ steps.zip_step.outputs.zip_path }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
