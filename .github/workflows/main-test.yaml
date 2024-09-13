@@ -20,11 +20,10 @@ jobs:
 
       - name: Zip artifact with version
         id: zip_step
-        uses: ./.github/actions/zip-artifact
+        uses: ./.github/actions/zip-artifact  # This references your composite action
         with:
-          source: './config'
-          destination: './artifacts'
-          version: ${{ needs.generate-version.outputs.version }}
+          source: './config'           # The folder to be zipped
+          destination: 'artifact-${{ needs.generate-version.outputs.version }}.zip'  
 
   # Step 3: Call reusable deploy workflow
   deploy-artifact:
