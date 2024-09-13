@@ -23,12 +23,15 @@ jobs:
         uses: ./.github/actions/zip-artifact  # This references your composite action
         with:
           source: './config'           # The folder to be zipped
-          destination: 'artifact-${{ needs.generate-version.outputs.version }}.zip'  
+          destination: 'artifact-${{ needs.generate-version.outputs.version }}.zip' 
+      # Set the output so that the next job can use it
+      - name: Set zip_path as output
+        run: echo "zip_path=${{ steps.zip_step.outputs.zip_path }}" >> $GITHUB_ENV
 
   # Step 3: Call reusable deploy workflow
   deploy-artifact:
     needs: zip-artifact
     uses: pacific-devops/resuable/.github/workflows/reusable-deploy.yml@main
     with:
-      zip_path: ${{ steps.zip_step.outputs.zip_path }}
+      zip_path: ${{ env.zip_path }}
       destination_repo: 'my-allowed-repo'
