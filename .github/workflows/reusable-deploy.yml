@@ -4,13 +4,13 @@ on:
   workflow_call:
     inputs:
       zip_path:
-          description: 'Path to the zipped artifact'
-          type: string
-          required: true
+        description: 'Path to the zipped artifact'
+        type: string
+        required: true
       destination_repo:
-           description: 'The destination repository to deploy to'
-           type: string
-           required: true
+        description: 'The destination repository to deploy to'
+        type: string
+        required: true
 
 jobs:
   deploy_artifact:
