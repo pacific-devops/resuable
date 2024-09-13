@@ -27,7 +27,7 @@ jobs:
           destination: 'artifact-${{ needs.generate-version.outputs.version }}.zip'  # Zip file will be created in the current directory
           version: ${{ needs.generate-version.outputs.version }}  # Pass the version from the version workflow
       - name: Debug
-        run: echo ${{ steps.zip_step.outputs.zip_path }}
+        run: echo "Zipped file path:${{ steps.zip_step.outputs.zip_path }}"
         
 
   # Step 3: Call reusable deploy workflow at the top-level 'uses' key
