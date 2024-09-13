@@ -14,8 +14,6 @@ jobs:
   zip-artifact:
     runs-on: ubuntu-latest
     needs: generate-version
-    outputs:
-      zip_path: ${{ steps.zip_step.outputs.zip_path }}  # Pass the zip_path to the next job
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -26,16 +24,12 @@ jobs:
         uses: ./.github/actions/zip-artifact  # This references your composite action
         with:
           source: './config'                # The folder to be zipped
-          destination: '.'                  # Zip file will be created in the current directory
+          destination: 'artifact-${{ needs.generate-version.outputs.version }}.zip'  # Zip file will be created in the current directory
           version: ${{ needs.generate-version.outputs.version }}  # Pass the version from the version workflow
 
-  # Step 3: Call reusable deploy workflow
+  # Step 3: Call reusable deploy workflow at the top-level 'uses' key
   deploy-artifact:
-    runs-on: ubuntu-latest
-    needs: zip-artifact
-    steps:
-      - name: Deploy artifact
-        uses: pacific-devops/resuable/.github/workflows/reusable-deploy.yml@main
-        with:
-          zip_path: ${{ needs.zip-artifact.outputs.zip_path }}  # Access the zip_path output from the previous job
-          destination_repo: 'my-allowed-repo'
+    uses: pacific-devops/resuable/.github/workflows/reusable-deploy.yml@main
+    with:
+      zip_path: ${{ needs.zip-artifact.outputs.zip_path }}  # Access the zip_path output from the previous job
+      destination_repo: 'my-allowed-repo'
