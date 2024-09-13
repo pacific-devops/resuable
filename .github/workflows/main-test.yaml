@@ -14,6 +14,8 @@ jobs:
   zip-artifact:
     runs-on: ubuntu-latest
     needs: generate-version
+    outputs:
+      zip_path: ${{ steps.zip_step.outputs.zip_path }} 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -33,5 +35,5 @@ jobs:
     needs: zip-artifact
     uses: pacific-devops/resuable/.github/workflows/reusable-deploy.yml@main
     with:
-      zip_path: ${{ env.zip_path }}
+      zip_path: ${{ needs.zip-artifact.outputs.zip_path }}
       destination_repo: 'my-allowed-repo'
