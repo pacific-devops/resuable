@@ -1,0 +1,54 @@
+import os
+import sys
+import requests
+
+def upload_to_jfrog(parent_folder, jfrog_repo):
+    # Get JFrog credentials from environment variables
+    jfrog_url = os.getenv('JFROG_URL')
+    jfrog_user = os.getenv('JFROG_USER')
+    jfrog_api_key = os.getenv('JFROG_API_KEY')
+
+    # Check if credentials are provided
+    if not jfrog_url or not jfrog_user or not jfrog_api_key:
+        print("Error: Missing JFrog connection details in environment variables.")
+        return
+
+    # Loop through files in the parent folder and upload using JFrog REST API
+    for root, _, files in os.walk(parent_folder):
+        for file in files:
+            full_path = os.path.join(root, file)
+            relative_path = os.path.relpath(full_path, parent_folder)
+            upload_url = f"{jfrog_url}/{jfrog_repo}/{relative_path}"
+
+            # Get the local file size
+            local_file_size = os.path.getsize(full_path)
+
+            # Check if the file exists in JFrog and get its size
+            response = requests.head(upload_url, auth=(jfrog_user, jfrog_api_key))
+            if response.status_code == 200:
+                # Get file size from JFrog
+                jfrog_file_size = int(response.headers.get('Content-Length', 0))
+
+                # Compare sizes and skip if they match
+                if jfrog_file_size == local_file_size:
+                    print(f"Skipping identical file: {relative_path} (size: {local_file_size} bytes)")
+                    continue
+                else:
+                    print(f"File exists but sizes differ. Re-uploading: {relative_path} (local: {local_file_size}, JFrog: {jfrog_file_size})")
+
+            # Upload the file if it doesn't exist or sizes differ
+            with open(full_path, 'rb') as f:
+                response = requests.put(upload_url, auth=(jfrog_user, jfrog_api_key), data=f)
+                if response.status_code == 201:
+                    print(f"Uploaded: {relative_path}")
+                else:
+                    print(f"Failed to upload {relative_path}: {response.status_code} {response.text}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python upload_to_jfrog.py <parent_folder> <jfrog_repo>")
+        sys.exit(1)
+
+    parent_folder = sys.argv[1]
+    jfrog_repo = sys.argv[2]
+    upload_to_jfrog(parent_folder, jfrog_repo)
