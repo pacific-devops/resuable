@@ -1,9 +1,7 @@
 name: 'Main Workflow to Call Reusable Workflows and Composite Action'
 
 on:
-  push:
-    branches:
-      - main
+ workflow_call:
 
 jobs:
   # Step 1: Call reusable version workflow
