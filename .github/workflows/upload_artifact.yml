@@ -3,7 +3,7 @@ name: Reusable Workflow for Zipping and Uploading Artifact
 on:
   workflow_call:
     inputs:
-      artifact-name:
+      artifact-prefix:
         description: 'Prefix for the artifact name'
         required: true
         type: string
