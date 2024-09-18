@@ -1,0 +1,16 @@
+name: Main Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-and-upload:
+    uses: ./github/workflows/upload_artifact.yml
+    with:
+      artifact-prefix: 'canvas'
+
+  download-and-upload-to-jfrog:
+    needs: generate-and-upload
+    uses: ./github/workflows/download_and_upload_to_jfrog.yml
+    with:
+      artifact-prefix: 'canvas'
