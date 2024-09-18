@@ -1,0 +1,12 @@
+name: 'Generate Artifact Name'
+description: 'Generates a dynamic artifact name using short SHA and run number'
+inputs:
+  prefix:
+    description: 'Prefix for the artifact name'
+    required: true
+outputs:
+  artifact_name:
+    description: 'The generated artifact name with short SHA and run number'
+runs:
+  using: 'node12'
+  main: 'index.js'
