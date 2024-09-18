@@ -5,12 +5,12 @@ on:
 
 jobs:
   generate-and-upload:
-    uses: your-repo-name/your-repo-name/.github/workflows/upload_artifact.yml@main
+    uses: .github/workflows/upload_artifact.yml@main
     with:
       artifact-prefix: 'canvas'
 
   download-and-upload-to-jfrog:
     needs: generate-and-upload
-    uses: your-repo-name/your-repo-name/.github/workflows/download_and_upload_to_jfrog.yml@main
+    uses: .github/workflows/download_and_upload_to_jfrog.yml@main
     with:
       artifact-prefix: 'canvas'
