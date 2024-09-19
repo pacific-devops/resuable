@@ -14,13 +14,7 @@ jobs:
     steps:
       # Step 1: Checkout the repository to access repo-mapping.yml
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Step 2: Install yq
-      - name: Install yq
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y yq
+        uses: actions/checkout@v4
 
       # Step 3: Check if the GitHub repo is allowed for JFrog repo
       - name: Check if GitHub repo is allowed for JFrog repo
