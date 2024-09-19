@@ -24,7 +24,7 @@ jobs:
       # Step 3: Run the Python script to check JFrog repo access
       - name: Check if GitHub repo is allowed for JFrog repo
         run: |
-          python check_jfrog_access.py
+          python config/check_jfrog_access.py
         env:
           GITHUB_REPO_ID: ${{ github.repository_id }}
           JFROG_REPO: ${{ inputs.jfrog_repo }}
