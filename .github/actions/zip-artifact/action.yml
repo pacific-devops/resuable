@@ -1,30 +1,35 @@
-name: 'Zip Artifact'
-description: 'Zip artifacts using the provided version number'
-inputs:
-  source:
-    description: 'The path to the folder or file to zip'
-    required: true
-  destination:
-    description: 'The name of the zip file to be created'
-    required: true
-  version:
-    description: 'The version number to include in the artifact name'
-    required: true
-outputs:
-  zip_path:
-    description: 'The path to the zipped artifact'
-    value: ${{ steps.zip_step.outputs.zip_path }}  # Define the value properly
-runs:
-  using: 'composite'
-  steps:
-    - name: Zip the artifact
-      id: zip_step
-      shell: bash
-      run: |
-        zip_name="artifact-${{ inputs.version }}.zip"  # Create the zip file in the current directory
-        zip -r $zip_name ${{ inputs.source }}          # Zip the source directory into the current directory
-        echo "zip_path=$zip_name" >> $GITHUB_OUTPUT    # Set the output for zip_path
+name: "Generate Artifact Names"
+description: "Generates both the standard JFrog artifact name and the temporary GitHub artifact name"
 
-    - name: Debug
-      shell: bash
-      run: ls -la
+inputs:
+  artifact-file-name:
+    description: "The base artifact name for JFrog"
+    required: true
+
+outputs:
+  jfrog_artifact_name:
+    description: "The standard JFrog artifact name for final use"
+    value: ${{ steps.generate-names.outputs.jfrog_artifact_name }}
+  temp_artifact_name:
+    description: "The temporary artifact name for GitHub upload"
+    value: ${{ steps.generate-names.outputs.temp_artifact_name }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get Branch Name
+      run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-')" >> $GITHUB_ENV
+
+    - name: Generate Artifact Names
+      id: generate-names
+      run: |
+        SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+        TEMP_ARTIFACT_NAME="temp-build-artifact-${GITHUB_RUN_NUMBER}"
+        JFROG_ARTIFACT_NAME="${{ inputs.artifact-file-name }}-${SHORT_SHA}-${GITHUB_RUN_NUMBER}"
+
+        # Setting outputs for the composite action
+        echo "temp_artifact_name=$TEMP_ARTIFACT_NAME" >> $GITHUB_OUTPUT
+        echo "jfrog_artifact_name=$JFROG_ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+        echo "Temporary artifact name: $TEMP_ARTIFACT_NAME"
+        echo "JFrog artifact name: $JFROG_ARTIFACT_NAME"
