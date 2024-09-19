@@ -19,7 +19,7 @@ jobs:
       # Step 1: Generate the artifact name with short SHA and run number
       - name: Generate Artifact Name
         id: generate_artifact_name
-        uses: ./github/actions/generate-artifact-name
+        uses: ./.github/actions/generate-artifact-name
         with:
           prefix: ${{ inputs.artifact-prefix }}
 
