@@ -18,10 +18,12 @@ runs:
   using: "composite"
   steps:
     - name: Get Branch Name
+      shell: bash
       run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-')" >> $GITHUB_ENV
 
     - name: Generate Artifact Names
       id: generate-names
+      shell: bash
       run: |
         SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
         TEMP_ARTIFACT_NAME="temp-build-artifact-${GITHUB_RUN_NUMBER}"
