@@ -30,7 +30,7 @@ jobs:
       # Step 2: Zip the provided files using the temporary GitHub artifact name
       - name: Zip the files
         run: |
-          ZIP_NAME="${{ steps.generate-artifact-names.outputs.temp_artifact_name }}.zip"
+          ZIP_NAME="${{ steps.generate-artifact-name.outputs.temp_artifact_name }}.zip"
           echo "Zipping files into: $ZIP_NAME"
           zip -r $ZIP_NAME ${{ inputs.files-to-zip }}
 
