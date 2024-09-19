@@ -6,7 +6,7 @@ on:
 jobs:
   # Step 1: Zip files and upload to GitHub with a temporary name
   build-and-upload:
-    uses: ./.github/workflows/build_and_zip.yml
+    uses: ./.github/workflows/upload_artifact.yml
     with:
       artifact-file-name: "canvas-final-artifact"
       files-to-zip: "config/*"
@@ -16,4 +16,4 @@ jobs:
     needs: build-and-upload
     uses: ./.github/workflows/download_and_upload_to_jfrog.yml
     with:
-      jfrog-artifact-name: ${{ steps.build-and-upload.outputs.jfrog_artifact_name }}
+      jfrog-artifact-name: ${{ needs.build-and-upload.outputs.jfrog_artifact_name }}
