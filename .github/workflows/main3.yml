@@ -1,16 +1,19 @@
-name: Main Workflow
+name: Main Workflow for Building, Zipping, and Uploading to JFrog
 
 on:
   workflow_dispatch:
 
 jobs:
-  generate-and-upload:
-    uses: ./.github/workflows/upload_artifact.yml
+  # Step 1: Zip files and upload to GitHub with a temporary name
+  build-and-upload:
+    uses: ./.github/workflows/build_and_zip.yml
     with:
-      artifact-prefix: "${{ github.sha::7 }}"
+      artifact-file-name: "canvas-final-artifact"
+      files-to-zip: "config/*"
 
-  download-and-upload-to-jfrog:
-    needs: generate-and-upload
+  # Step 2: Download the temporary GitHub artifact and upload to JFrog
+  download-and-upload:
+    needs: build-and-upload
     uses: ./.github/workflows/download_and_upload_to_jfrog.yml
     with:
-      artifact-prefix: "canvas"
+      jfrog-artifact-name: ${{ steps.build-and-upload.outputs.jfrog_artifact_name }}
