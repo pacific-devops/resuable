@@ -13,7 +13,7 @@ if not github_repo_id or not jfrog_repo:
 
 # Load the YAML file with the repository mapping
 try:
-    with open('./repo-mapping.yml', 'r') as file:
+    with open('repo-mapping.yml', 'r') as file:
         data = yaml.safe_load(file)
 except FileNotFoundError:
     print("Error: repo-mapping.yml file not found.")
