@@ -1,10 +1,10 @@
-name: Reusable Workflow to Download and Upload to JFrog
+name: Reusable Workflow for Downloading Temporary Artifact and Uploading to JFrog
 
 on:
   workflow_call:
     inputs:
-      artifact-prefix:
-        description: 'Prefix for the artifact name'
+      jfrog-artifact-name:
+        description: 'The final artifact name to be uploaded to JFrog'
         required: true
         type: string
 
@@ -14,21 +14,21 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      # Step 1: Generate the artifact name with short SHA and run number
-      - name: Generate Artifact Name
-        id: generate_artifact_name
-        uses: ./github/actions/generate-artifact-name
+      # Step 1: Download the temporary GitHub artifact
+      - name: Download Temporary GitHub Artifact
+        uses: actions/download-artifact@v2
         with:
-          prefix: ${{ inputs.artifact-prefix }}
+          name: "temp-build-artifact-${{ github.run_number }}"
 
-      # Step 2: Download the artifact using the generated artifact name
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ steps.generate_artifact_name.outputs.artifact_name }}
+      # Step 2: Unzip the downloaded artifact
+      - name: Unzip Artifact
+        run: |
+          unzip "*.zip" -d ./unzipped
 
-      # Step 3: Upload to JFrog (or just check that we got the artifact)
-      - name: List downloaded files
-        run: ls
+      # Step 3: Upload the unzipped artifact to JFrog using the JFrog artifact name
+      - name: Upload to JFrog
+        run: |
+          echo "Uploading to JFrog with final artifact name: ${{ inputs.jfrog-artifact-name }}"
+          jf rt upload "unzipped/*" "your-jfrog-repo/${{ inputs.jfrog-artifact-name }}/"
