@@ -1,0 +1,10 @@
+repo_mapping:
+  Hello_testing: &Hello_testing 854435773
+  resuable: &resuable 854566419
+  
+allowed_jfrog_pushes:
+  gdap-maven-dev-local:
+    - *GDAP_ITEM_VISTA
+    - *MOSOT
+  gdap-maven-prod-local:
+    - *MOSOT
