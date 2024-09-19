@@ -30,7 +30,7 @@ jobs:
       # Step 2: Zip the provided files using the temporary GitHub artifact name
       - name: Zip the files
         run: |
-          ZIP_NAME="${{ steps.generate-artifact-name.outputs.temp_artifact_name }}.zip"
+          ZIP_NAME="${{ steps.generate-artifact-name.outputs.jfrog_artifact_name}}.zip"
           echo "Zipping files into: $ZIP_NAME"
           zip -r $ZIP_NAME ${{ inputs.files-to-zip }}
 
@@ -38,9 +38,9 @@ jobs:
       - name: Upload Temporary GitHub Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.generate-artifact-names.outputs.temp_artifact_name }}
+          name: ${{ steps.generate-artifact-name.outputs.temp_artifact_name }}
           path: ./*.zip
 
       # Optional: Log the JFrog artifact name (for clarity)
       - name: Log JFrog Artifact Name
-        run: echo "JFrog Artifact Name:${{ steps.generate-artifact-names.outputs.jfrog_artifact_name }}"
+        run: echo "JFrog Artifact Name:${{ steps.generate-artifact-name.outputs.jfrog_artifact_name }}"
