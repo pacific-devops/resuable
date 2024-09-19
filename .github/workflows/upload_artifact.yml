@@ -22,7 +22,7 @@ jobs:
 
       # Step 1: Generate both artifact names (temporary for GitHub, standard for JFrog)
       - name: Generate Artifact Names
-        uses: ./.github/actions/generate-artifact-names
+        uses: ./.github/actions/zip-artifact
         with:
           artifact-file-name: ${{ inputs.artifact-file-name }}
 
