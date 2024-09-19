@@ -7,10 +7,10 @@ jobs:
   generate-and-upload:
     uses: ./.github/workflows/upload_artifact.yml
     with:
-      artifact-prefix: 'canvas'
+      artifact-prefix: "${{ github.sha::7 }}"
 
   download-and-upload-to-jfrog:
     needs: generate-and-upload
     uses: ./.github/workflows/download_and_upload_to_jfrog.yml
     with:
-      artifact-prefix: 'canvas'
+      artifact-prefix: "canvas"
