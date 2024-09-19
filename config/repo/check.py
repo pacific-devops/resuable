@@ -11,9 +11,9 @@ if not github_repo_id or not jfrog_repo:
     print("Error: GITHUB_REPO_ID and JFROG_REPO must be provided as environment variables.")
     sys.exit(1)
 
-# Load the YAML file with the repository mapping
+# Load the YAML file with the repository mapping (update with correct path)
 try:
-    with open('repo-mapping.yml', 'r') as file:
+    with open('config/repo/repo-mapping.yml', 'r') as file:
         data = yaml.safe_load(file)
 except FileNotFoundError:
     print("Error: repo-mapping.yml file not found.")
