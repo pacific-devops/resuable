@@ -1,0 +1,30 @@
+name: Check JFrog Repo Access
+
+on:
+  workflow_dispatch:
+    inputs:
+      jfrog_repo:
+        description: 'Enter the JFrog repo to deploy'
+        required: true
+
+jobs:
+  check-jfrog-access:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository to access repo-mapping.yml and the Python script
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Get the GitHub repository ID
+      - name: Get GitHub Repository ID
+        id: get_repo_id
+        run: echo "Repository ID:${{ github.repository_id }}"
+
+      # Step 3: Run the Python script to check JFrog repo access
+      - name: Check if GitHub repo is allowed for JFrog repo
+        run: |
+          python check_jfrog_access.py
+        env:
+          GITHUB_REPO_ID: ${{ github.repository_id }}
+          JFROG_REPO: ${{ inputs.jfrog_repo }}
