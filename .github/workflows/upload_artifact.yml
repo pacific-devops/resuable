@@ -1,45 +1,45 @@
-name: Reusable Workflow for Zipping and Uploading Artifact
+name: Reusable Workflow for Zipping and Uploading GitHub Artifact
 
 on:
   workflow_call:
     inputs:
-      artifact-prefix:
-        description: 'Prefix for the artifact name'
+      artifact-file-name:
+        description: 'The final JFrog artifact file name'
+        required: true
+        type: string
+      files-to-zip:
+        description: 'The list of files to zip and upload'
         required: true
         type: string
 
 jobs:
-  upload-artifact:
+  zip-and-upload:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Debug
-        run: echo ${{inputs.artifact-prefix}}
+        uses: actions/checkout@v2
 
-      # Step 1: Generate the artifact name with short SHA and run number
-      - name: Generate Artifact Name
-        id: generate_artifact_name
-        uses: ./.github/actions/generate-artifact-name
+      # Step 1: Generate both artifact names (temporary for GitHub, standard for JFrog)
+      - name: Generate Artifact Names
+        uses: ./.github/actions/generate-artifact-names
         with:
-          prefix: ${{ inputs.artifact-prefix }}
+          artifact-file-name: ${{ inputs.artifact-file-name }}
 
-      # Step 2: Create a sample file or folder to zip
-      - name: Create a sample file
+      # Step 2: Zip the provided files using the temporary GitHub artifact name
+      - name: Zip the files
         run: |
-          echo "This is a test file for artifact upload" > sample.txt
+          ZIP_NAME="${{ steps.generate-artifact-names.outputs.temp_artifact_name }}.zip"
+          echo "Zipping files into: $ZIP_NAME"
+          zip -r $ZIP_NAME ${{ inputs.files-to-zip }}
 
-      # Step 3: Zip the file and upload as artifact
-      - name: Zip the file
-        run: |
-          ZIP_NAME="${{ steps.generate_artifact_name.outputs.artifact_name }}.zip"
-          zip $ZIP_NAME sample.txt
-          echo "Zipped file: $ZIP_NAME"
-
-      # Step 4: Upload the zip file using the dynamically generated name
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+      # Step 3: Upload the zip file as a GitHub artifact using the temporary artifact name
+      - name: Upload Temporary GitHub Artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: ${{ steps.generate_artifact_name.outputs.artifact_name }}
+          name: ${{ steps.generate-artifact-names.outputs.temp_artifact_name }}
           path: ./*.zip
+
+      # Optional: Log the JFrog artifact name (for clarity)
+      - name: Log JFrog Artifact Name
+        run: echo "JFrog Artifact Name:${{ steps.generate-artifact-names.outputs.jfrog_artifact_name }}"
