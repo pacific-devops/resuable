@@ -4,7 +4,7 @@ repo_mapping:
   
 allowed_jfrog_pushes:
   gdap-maven-dev-local:
-    - *GDAP_ITEM_VISTA
-    - *MOSOT
+    - *Hello_testing
+    - *resuable
   gdap-maven-prod-local:
-    - *MOSOT
+    - *Hello_testing
