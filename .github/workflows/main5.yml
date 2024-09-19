@@ -14,7 +14,13 @@ jobs:
     steps:
       # Step 1: Checkout the repository to access repo-mapping.yml
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
+
+      # Step 2: Install yq
+      - name: Install yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yq
 
       # Step 3: Check if the GitHub repo is allowed for JFrog repo
       - name: Check if GitHub repo is allowed for JFrog repo
@@ -23,8 +29,9 @@ jobs:
           GITHUB_REPO_ID=${{ github.repository_id }}
           JFROG_REPO=${{ inputs.jfrog_repo }}
 
-          # Use yq to extract the list of allowed repo IDs for the JFrog repo
-          ALLOWED_REPOS=$(yq e ".allowed_jfrog_pushes.$JFROG_REPO[]" config/repo/repo-mapping.yml)
+          # Extract the actual values (IDs) from the repo_mapping section
+          # Use yq to resolve the aliases in the allowed_jfrog_pushes
+          ALLOWED_REPOS=$(yq e '.allowed_jfrog_pushes."'"$JFROG_REPO"'"[] | select(.) as $x | . as $key | . | capture("\\*(?<alias>.+)") | .alias | . as $key | .repo_mapping[$key]' config/repo/repo-mapping.yml)
 
           # Convert the result to a space-separated list
           echo "Allowed repos: $ALLOWED_REPOS"
