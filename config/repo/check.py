@@ -11,7 +11,7 @@ if not github_repo_id or not jfrog_repo:
     print("Error: GITHUB_REPO_ID and JFROG_REPO must be provided as environment variables.")
     sys.exit(1)
 
-# Load the YAML file with the repository mapping (update with correct path)
+# Load the YAML file with the repository mapping
 try:
     with open('config/repo/repo-mapping.yml', 'r') as file:
         data = yaml.safe_load(file)
@@ -25,8 +25,12 @@ allowed_jfrog_pushes = data.get('allowed_jfrog_pushes', {})
 # Check if the JFrog repository exists in the YAML mapping
 allowed_repos = allowed_jfrog_pushes.get(jfrog_repo, [])
 
+# Ensure both the GitHub repo ID and allowed IDs are strings
+github_repo_id_str = str(github_repo_id)
+allowed_repos_str = [str(repo) for repo in allowed_repos]
+
 # Check if the GitHub repository ID is in the allowed list
-if github_repo_id in allowed_repos:
+if github_repo_id_str in allowed_repos_str:
     print(f"Repo ID {github_repo_id} is allowed to push to {jfrog_repo}")
     sys.exit(0)
 else:
