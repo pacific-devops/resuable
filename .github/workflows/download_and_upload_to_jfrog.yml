@@ -14,18 +14,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # Step 1: Download the temporary GitHub artifact
       - name: Download Temporary GitHub Artifact
         uses: actions/download-artifact@v2
         with:
           name: "temp-build-artifact-${{ github.run_number }}"
-
-      # Step 2: Unzip the downloaded artifact
-      - name: Unzip Artifact
-        run: |
-          unzip "*.zip" -d ./unzipped
+      -  name: debug
+         run: ls -la 
 
       # Step 3: Upload the unzipped artifact to JFrog using the JFrog artifact name
       - name: Upload to JFrog
