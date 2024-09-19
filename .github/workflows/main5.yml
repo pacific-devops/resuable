@@ -1,0 +1,38 @@
+name: Check JFrog Repo Access
+
+on:
+  workflow_dispatch:
+    inputs:
+      jfrog_repo:
+        description: 'Enter the JFrog repo to deploy'
+        required: true
+
+jobs:
+  check-jfrog-access:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository to access repo-mapping.yml
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 3: Check if the GitHub repo is allowed for JFrog repo
+      - name: Check if GitHub repo is allowed for JFrog repo
+        run: |
+          # Set variables
+          GITHUB_REPO_ID=${{ github.repository_id }}
+          JFROG_REPO=${{ inputs.jfrog_repo }}
+
+          # Use yq to extract the list of allowed repo IDs for the JFrog repo
+          ALLOWED_REPOS=$(yq e ".allowed_jfrog_pushes.$JFROG_REPO[]" config/repo/repo-mapping.yml)
+
+          # Convert the result to a space-separated list
+          echo "Allowed repos: $ALLOWED_REPOS"
+
+          # Check if the GitHub repository ID is in the list of allowed repos
+          if echo "$ALLOWED_REPOS" | grep -q "$GITHUB_REPO_ID"; then
+            echo "Repo ID $GITHUB_REPO_ID is allowed to push to $JFROG_REPO"
+          else
+            echo "Repo ID $GITHUB_REPO_ID is NOT allowed to push to $JFROG_REPO"
+            exit 1
+          fi
