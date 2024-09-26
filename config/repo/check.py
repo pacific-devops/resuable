@@ -44,6 +44,7 @@ print(combined_data)
 
 # Extract allowed JFrog pushes
 allowed_jfrog_pushes = combined_data.get('allowed_jfrog_pushes', {})
+repo_mapping = combined_data.get('repo_mapping', {})
 
 # Check if the JFrog repository exists in the YAML mapping
 allowed_repos = allowed_jfrog_pushes.get(jfrog_repo, {})
@@ -58,9 +59,9 @@ for repo_entry in allowed_repos:
 
     print(f"Checking repo alias: {repo_alias}")  # Debug print
 
-    # Check if GitHub repo ID matches the alias
+    # Check if GitHub repo ID matches the alias in the repo_mapping section
     try:
-        if github_repo_id_str == str(combined_data[repo_alias]):
+        if github_repo_id_str == str(repo_mapping[repo_alias]):
             # Check if the folder matches any allowed folders (including subfolders)
             if any(jfrog_folder.startswith(folder) for folder in folders):
                 print(f"Repo ID {github_repo_id} is allowed to push to {jfrog_repo}/{jfrog_folder}")
@@ -69,7 +70,7 @@ for repo_entry in allowed_repos:
                 print(f"Repo ID {github_repo_id} does NOT have access to the folder {jfrog_repo}/{jfrog_folder}")
                 sys.exit(1)
     except KeyError:
-        print(f"KeyError: The alias {repo_alias} does not exist in the combined data.")
+        print(f"KeyError: The alias {repo_alias} does not exist in the repo_mapping.")
         sys.exit(1)
 
 # If no match is found
