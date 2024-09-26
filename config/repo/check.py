@@ -12,27 +12,34 @@ if not github_repo_id or not jfrog_repo or not jfrog_folder:
     print("Error: GITHUB_REPO_ID, JFROG_REPO, and JFROG_FOLDER must be provided as environment variables.")
     sys.exit(1)
 
-# Load the repository mapping (repo_mapping.yml)
+# Read the repo_mapping.yml file
 try:
     with open('config/repo/repo_mapping.yml', 'r', encoding='utf-8') as file:
-        repo_data = yaml.safe_load(file)['repo_mapping']  # Unpack repo_mapping section
+        repo_mapping_content = file.read()
 except FileNotFoundError:
     print("Error: repo-mapping.yml file not found.")
     sys.exit(1)
 
-# Load the JFrog mapping (allowed_jfrog_pushes.yml)
+# Read the allowed_jfrog_pushes.yml file
 try:
     with open('config/repo/allowed_jfrog_pushes.yml', 'r', encoding='utf-8') as file:
-        jfrog_data = yaml.safe_load(file)
+        jfrog_pushes_content = file.read()
 except FileNotFoundError:
     print("Error: allowed_jfrog_pushes.yml file not found.")
     sys.exit(1)
 
-# Now merge the two dictionaries to allow aliases to work
-jfrog_data.update(repo_data)
+# Combine both files into a single YAML string
+combined_yaml = repo_mapping_content + '\n' + jfrog_pushes_content
+
+# Parse the combined YAML string
+try:
+    combined_data = yaml.safe_load(combined_yaml)
+except yaml.YAMLError as exc:
+    print(f"Error parsing combined YAML: {exc}")
+    sys.exit(1)
 
 # Extract allowed JFrog pushes
-allowed_jfrog_pushes = jfrog_data.get('allowed_jfrog_pushes', {})
+allowed_jfrog_pushes = combined_data.get('allowed_jfrog_pushes', {})
 
 # Check if the JFrog repository exists in the YAML mapping
 allowed_repos = allowed_jfrog_pushes.get(jfrog_repo, {})
@@ -46,7 +53,7 @@ for repo_entry in allowed_repos:
     folders = repo_entry['folders']  # Get the allowed folders
     
     # Check if GitHub repo ID matches the alias
-    if github_repo_id_str == str(jfrog_data[repo_alias]):
+    if github_repo_id_str == str(combined_data[repo_alias]):
         # Check if the folder matches any allowed folders (including subfolders)
         if any(jfrog_folder.startswith(folder) for folder in folders):
             print(f"Repo ID {github_repo_id} is allowed to push to {jfrog_repo}/{jfrog_folder}")
