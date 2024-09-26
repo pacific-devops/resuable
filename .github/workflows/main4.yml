@@ -30,3 +30,4 @@ jobs:
         env:
           GITHUB_REPO_ID: ${{ github.repository_id }}
           JFROG_REPO: ${{ inputs.jfrog_repo }}
+          JFROG_FOLDER: pace
