@@ -1,6 +1,16 @@
 allowed_jfrog_pushes:
   gdap-maven-dev-local:
-    - *Hello_testing  # Alias references the Hello_testing anchor
-    - *resuable       # Alias references the resuable anchor
-  gdap-maven-prod-local:
-    - *Hello_testing  # Alias references the Hello_testing anchor
+    - id: *Hello_testing
+      folders: 
+        - pace
+        - subfolder1/subfolder2
+  gdap-dsale-maven-dev-local:
+    - id: *resuable
+      folders: 
+        - pace
+        - another-folder/subfolder
+  gdap-dsale-generic-dev-local:
+    - id: *GDAP-ITEM-VISTA
+      folders: 
+        - data
+        - analytics/subanalytics
