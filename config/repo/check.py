@@ -15,7 +15,7 @@ if not github_repo_id or not jfrog_repo or not jfrog_folder:
 # Load the repository mapping (repo_mapping.yml)
 try:
     with open('config/repo/repo_mapping.yml', 'r', encoding='utf-8') as file:
-        repo_data = yaml.safe_load(file)
+        repo_data = yaml.safe_load(file)['repo_mapping']  # Unpack repo_mapping section
 except FileNotFoundError:
     print("Error: repo-mapping.yml file not found.")
     sys.exit(1)
@@ -28,7 +28,7 @@ except FileNotFoundError:
     print("Error: allowed_jfrog_pushes.yml file not found.")
     sys.exit(1)
 
-# Merge the two YAML dictionaries (bringing repo_mapping anchors into jfrog_data's context)
+# Now merge the two dictionaries to allow aliases to work
 jfrog_data.update(repo_data)
 
 # Extract allowed JFrog pushes
