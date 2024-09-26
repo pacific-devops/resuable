@@ -15,6 +15,8 @@ jobs:
       # Step 1: Checkout the repository to access repo-mapping.yml
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Debug
+        run: ls -la config/repo/
 
       # Step 3: Check if the GitHub repo is allowed for JFrog repo
       - name: Check if GitHub repo is allowed for JFrog repo
