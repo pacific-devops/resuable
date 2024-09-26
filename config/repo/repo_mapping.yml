@@ -1,6 +1,7 @@
 repo_mapping:
-  Hello_testing: &Hello_testing 854435773
-  resuable: &resuable 854566419
+  Hello_testing: &Hello_testing 854435773  # Defining the anchor for Hello_testing
+  resuable: &resuable 854566419  # Defining the anchor for resuable
+  GDAP-ITEM-VISTA: &GDAP-ITEM-VISTA 781452168  # Defining the anchor for GDAP-ITEM-VISTA
 
 
   
