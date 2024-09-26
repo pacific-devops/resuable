@@ -1,16 +1,16 @@
 allowed_jfrog_pushes:
   gdap-maven-dev-local:
-    - id: *Hello_testing
+    - id: *Hello_testing  # Using the alias for Hello_testing
       folders: 
         - pace
         - subfolder1/subfolder2
   gdap-dsale-maven-dev-local:
-    - id: *resuable
+    - id: *resuable  # Using the alias for resuable
       folders: 
         - pace
         - another-folder/subfolder
   gdap-dsale-generic-dev-local:
-    - id: *GDAP-ITEM-VISTA
+    - id: *GDAP-ITEM-VISTA  # Using the alias for GDAP-ITEM-VISTA
       folders: 
         - data
         - analytics/subanalytics
