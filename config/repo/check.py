@@ -14,7 +14,7 @@ if not github_repo_id or not jfrog_repo or not jfrog_folder:
 
 # Read the repo_mapping.yml file
 try:
-    with open('config/repo/repo-mapping.yml', 'r', encoding='utf-8') as file:
+    with open('config/repo/repo_mapping.yml', 'r', encoding='utf-8') as file:
         repo_mapping_content = file.read()
 except FileNotFoundError:
     print("Error: repo-mapping.yml file not found.")
