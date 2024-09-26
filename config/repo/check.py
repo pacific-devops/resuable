@@ -26,7 +26,7 @@ if 'repo_mapping' in repo_data:
 
 # Load the JFrog mapping (allowed_jfrog_pushes.yml)
 try:
-    with open('/config/repo/allowed_jfrog_pushes.yml', 'r', encoding='utf-8') as file:
+    with open('config/repo/allowed_jfrog_pushes.yml', 'r', encoding='utf-8') as file:
         jfrog_data = yaml.safe_load(file)
 except FileNotFoundError:
     print("Error: allowed_jfrog_pushes.yml file not found.")
