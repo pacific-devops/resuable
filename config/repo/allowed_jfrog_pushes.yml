@@ -1,3 +1,5 @@
+---
+
 allowed_jfrog_pushes:
   gdap-maven-dev-local:
     - id: *Hello_testing  # Using the alias for Hello_testing
