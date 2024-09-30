@@ -1,4 +1,4 @@
-name: Check JFrog Repo Access
+name: JFROG CHECKER
 
 on:
   workflow_dispatch:
