@@ -24,12 +24,12 @@ def main():
 
     # Read the repo_mapping.yml and allowed_jfrog_pushes.yml files
     with open(
-        "called-workflow-repo/config/jfrog/github_repo_id.yml", "r", encoding="utf-8"
+        "config/repo/repo_mapping.yml", "r", encoding="utf-8"
     ) as file:
         repo_mapping_content = file.read()
 
     with open(
-        "called-workflow-repo/config/jfrog/allowed_jfrog_pushes.yml",
+        "config/repo/allowed_jfrog_pushes.yml",
         "r",
         encoding="utf-8",
     ) as file:
