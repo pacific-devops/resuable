@@ -2,23 +2,20 @@ import yaml
 import os
 
 def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
-    # Load the `allowed_jfrog_pushes.yml`
+    # Load the allowed_jfrog_pushes.yml content as raw text
     with open(allowed_pushes_path, 'r') as f:
-        allowed_pushes = yaml.safe_load(f)
+        allowed_pushes_raw = f.read()
 
-    # Load the `repo_mapping.yml`
+    # Load the repo_mapping.yml content as raw text
     with open(repo_mapping_path, 'r') as f:
-        repo_mapping = yaml.safe_load(f)
+        repo_mapping_raw = f.read()
 
-    # Combine the two YAML documents into one structure
-    combined_yaml = [
-        {"allowed_jfrog_pushes": allowed_pushes},  # First document
-        {"repo_mapping": repo_mapping}  # Second document
-    ]
+    # Combine the two YAML documents into one string with document separator (---)
+    combined_yaml_raw = f"{allowed_pushes_raw}\n---\n{repo_mapping_raw}"
 
-    # Write the combined YAML to a new file with document separators (---)
+    # Write the combined YAML to a new file
     with open(output_path, 'w') as f:
-        yaml.dump_all(combined_yaml, f, default_flow_style=False)
+        f.write(combined_yaml_raw)
 
 def load_combined_yaml(output_path):
     # Load the combined YAML file, allowing it to handle anchors and aliases
