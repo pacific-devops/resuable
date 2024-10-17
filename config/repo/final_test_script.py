@@ -3,9 +3,9 @@ import os
 
 def check_access(jfrog_repo_name, github_repo_id, folder):
     # Load YAML files
-    with open("./allowed_jfrog_pushes.yaml", "r") as f:
+    with open("./allowed_jfrog_pushes.yml", "r") as f:
         allowed_pushes = yaml.safe_load(f)
-    with open("./repo_mapping.yaml", "r") as f:
+    with open("./repo_mapping.yml", "r") as f:
         repo_mapping = yaml.safe_load(f)
 
     # Expand alias
