@@ -17,7 +17,7 @@ def resolve_anchors(allowed_pushes_raw, repo_mapping):
     # Replace aliases in the allowed_pushes_raw with actual values from repo_mapping
     for alias, actual_value in repo_mapping.items():
         # Replace any occurrences of *alias with the actual value from repo_mapping
-        allowed_pushes_raw = re.sub(r'\*' + re.escape(alias), str(actual_value), allowed_pushes_raw)
+        allowed_pushes_raw = allowed_pushes_raw.replace(f'*{alias}', str(actual_value))
 
     # After replacing all aliases, load the modified YAML content
     allowed_pushes = yaml.safe_load(allowed_pushes_raw)
