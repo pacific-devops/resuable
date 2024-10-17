@@ -2,29 +2,29 @@ import yaml
 import os
 
 def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
-    # Load the allowed_jfrog_pushes.yml content as raw text
+    # Load the allowed_jfrog_pushes.yml as a dictionary
     with open(allowed_pushes_path, 'r') as f:
-        allowed_pushes_raw = f.read()
+        allowed_pushes = yaml.safe_load(f)
 
-    # Load the repo_mapping.yml content as raw text
+    # Load the repo_mapping.yml as a dictionary
     with open(repo_mapping_path, 'r') as f:
-        repo_mapping_raw = f.read()
+        repo_mapping = yaml.safe_load(f)
 
-    # Place repo_mapping first in the combined YAML, then allowed_jfrog_pushes
-    combined_yaml_raw = f"{repo_mapping_raw}\n---\n{allowed_pushes_raw}"
+    # Combine the two dictionaries into one YAML structure
+    combined_yaml = {"repo_mapping": repo_mapping, "allowed_jfrog_pushes": allowed_pushes}
 
-    # Write the combined YAML to a new file
+    # Write the combined structure to a single YAML file
     with open(output_path, 'w') as f:
-        f.write(combined_yaml_raw)
+        yaml.dump(combined_yaml, f, default_flow_style=False)
 
 def load_combined_yaml(output_path):
-    # Load the combined YAML file, allowing it to handle anchors and aliases
+    # Load the combined YAML file
     with open(output_path, 'r') as f:
-        documents = list(yaml.safe_load_all(f))  # Load all documents in the YAML file
+        combined_data = yaml.safe_load(f)  # Load the combined data
 
-    # Extract documents from the loaded YAML
-    repo_mapping = documents[0].get("repo_mapping", {})
-    allowed_pushes = documents[1].get("allowed_jfrog_pushes", {})
+    # Extract allowed_jfrog_pushes and repo_mapping
+    allowed_pushes = combined_data.get("allowed_jfrog_pushes", {})
+    repo_mapping = combined_data.get("repo_mapping", {})
     
     return allowed_pushes, repo_mapping
 
@@ -46,7 +46,7 @@ allowed_pushes_path = "config/repo/allowed_jfrog_pushes.yml"
 repo_mapping_path = "config/repo/repo_mapping.yml"
 combined_yaml_path = "config/repo/combined.yml"
 
-# Combine the two YAML files into one, with repo_mapping first
+# Combine the two YAML files into one document
 combine_yaml_files(allowed_pushes_path, repo_mapping_path, combined_yaml_path)
 
 # Example usage (can be used in GitHub Actions environment)
