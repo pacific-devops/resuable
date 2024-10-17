@@ -1,5 +1,6 @@
 import yaml
 import os
+import re
 
 def load_yaml_files(allowed_pushes_path, repo_mapping_path):
     # Load repo_mapping.yml content as a dictionary
@@ -13,6 +14,9 @@ def load_yaml_files(allowed_pushes_path, repo_mapping_path):
     return allowed_pushes_raw, repo_mapping
 
 def resolve_anchors(allowed_pushes_raw, repo_mapping):
+    # Remove YAML document marker (---) if present
+    allowed_pushes_raw = re.sub(r'---\s*\n', '', allowed_pushes_raw)
+
     # Manually replace each alias from repo_mapping in the raw text
     for alias, actual_value in repo_mapping.items():
         # Replace the alias in the raw YAML content
