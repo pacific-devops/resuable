@@ -16,15 +16,10 @@ def resolve_anchors(allowed_pushes_raw, repo_mapping):
     # Manually replace each alias from repo_mapping in the raw text
     for alias, actual_value in repo_mapping.items():
         # Replace the alias in the raw YAML content
-        allowed_pushes_raw = allowed_pushes_raw.replace(f'*{alias}', str(actual_value))
+        alias_pattern = f"*{alias}"
+        allowed_pushes_raw = allowed_pushes_raw.replace(alias_pattern, str(actual_value))
 
-    # Once all replacements are done, parse the modified YAML string
-    try:
-        allowed_pushes = yaml.safe_load(allowed_pushes_raw)
-        return allowed_pushes
-    except yaml.YAMLError as exc:
-        print(f"YAML Error: {exc}")
-        raise
+    return allowed_pushes_raw  # Returning the replaced raw YAML string
 
 def check_access(jfrog_repo_name, github_repo_id, folder):
     # Load the raw YAML and mappings
@@ -33,10 +28,17 @@ def check_access(jfrog_repo_name, github_repo_id, folder):
         "config/repo/repo_mapping.yml"
     )
 
-    # Replace all aliases before parsing YAML
-    allowed_pushes = resolve_anchors(allowed_pushes_raw, repo_mapping)
+    # Replace all aliases in the raw YAML content before parsing
+    replaced_yaml = resolve_anchors(allowed_pushes_raw, repo_mapping)
 
-    # Check access logic after alias resolution
+    # Parse the replaced YAML content
+    try:
+        allowed_pushes = yaml.safe_load(replaced_yaml)
+    except yaml.YAMLError as exc:
+        print(f"YAML Error: {exc}")
+        raise
+
+    # Now proceed with checking access
     for repo_name, repo_data in allowed_pushes.items():
         if repo_name == jfrog_repo_name:
             for entry in repo_data:
