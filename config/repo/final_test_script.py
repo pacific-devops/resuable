@@ -13,9 +13,9 @@ def load_yaml_files(allowed_pushes_path, repo_mapping_path):
     return allowed_pushes_raw, repo_mapping
 
 def resolve_anchors(allowed_pushes_raw, repo_mapping):
-    # Replace any aliases (e.g., *Hello_testing) with the values from repo_mapping.yml
+    # Replace aliases manually before loading YAML
     for alias, actual_value in repo_mapping.items():
-        # Replace *alias with actual value
+        # Replace *alias with actual value in the raw YAML content
         allowed_pushes_raw = allowed_pushes_raw.replace(f'*{alias}', str(actual_value))
 
     # Now parse the modified YAML content after replacements
