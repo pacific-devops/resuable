@@ -1,0 +1,17 @@
+name: JFrog Access Control
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-access:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check access
+        run: python config/repo/final_test_script.py  # Assuming the script is in the same directory
+        env:
+          JFROG_REPO_NAME: gdap-dsale-maven-dev-local
+          FOLDER: pace
