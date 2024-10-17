@@ -2,7 +2,7 @@ import yaml
 import os
 
 def load_yaml_files(allowed_pushes_path, repo_mapping_path):
-    # Load repo_mapping.yml content as dictionary
+    # Load repo_mapping.yml content as a dictionary
     with open(repo_mapping_path, 'r') as f:
         repo_mapping = yaml.safe_load(f)
 
@@ -13,23 +13,27 @@ def load_yaml_files(allowed_pushes_path, repo_mapping_path):
     return allowed_pushes_raw, repo_mapping
 
 def resolve_anchors(allowed_pushes_raw, repo_mapping):
-    # Replace aliases manually before loading YAML
+    # Manually replace each alias from repo_mapping in the raw text
     for alias, actual_value in repo_mapping.items():
-        # Replace *alias with actual value in the raw YAML content
+        # Replace the alias in the raw YAML content
         allowed_pushes_raw = allowed_pushes_raw.replace(f'*{alias}', str(actual_value))
 
-    # Now parse the modified YAML content after replacements
-    allowed_pushes = yaml.safe_load(allowed_pushes_raw)
-    return allowed_pushes
+    # Once all replacements are done, parse the modified YAML string
+    try:
+        allowed_pushes = yaml.safe_load(allowed_pushes_raw)
+        return allowed_pushes
+    except yaml.YAMLError as exc:
+        print(f"YAML Error: {exc}")
+        raise
 
 def check_access(jfrog_repo_name, github_repo_id, folder):
-    # Load YAML files
+    # Load the raw YAML and mappings
     allowed_pushes_raw, repo_mapping = load_yaml_files(
         "config/repo/allowed_jfrog_pushes.yml",
         "config/repo/repo_mapping.yml"
     )
 
-    # Resolve anchors (manual alias resolution)
+    # Replace all aliases before parsing YAML
     allowed_pushes = resolve_anchors(allowed_pushes_raw, repo_mapping)
 
     # Check access logic after alias resolution
@@ -41,7 +45,7 @@ def check_access(jfrog_repo_name, github_repo_id, folder):
                         return True
     return False
 
-# Example usage in a GitHub Actions environment
+# Example usage (can be used in GitHub Actions environment)
 jfrog_repo_name = os.environ.get("JFROG_REPO_NAME")
 github_repo_id = os.environ.get("GITHUB_REPO_ID")
 folder = os.environ.get("FOLDER")
