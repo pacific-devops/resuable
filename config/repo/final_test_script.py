@@ -1,11 +1,11 @@
 import yaml
 import os
 
-# Function to combine two YAML files into one (with manual alias replacement)
+# Function to combine two YAML files into one (without nesting the structure)
 def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Load repo_mapping.yml first
     with open(repo_mapping_path, 'r') as f:
-        repo_mapping = yaml.safe_load(f)  # Load as a single document
+        repo_mapping = yaml.safe_load(f)
 
     # Load allowed_jfrog_pushes.yml as raw text
     with open(allowed_pushes_path, 'r') as f:
@@ -14,32 +14,27 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Remove the '---' document separator if present in the second document
     allowed_pushes_raw = allowed_pushes_raw.replace('---\n', '')
 
-    # Manually replace the aliases with their corresponding values from repo_mapping
+    # Replace aliases with their corresponding values from repo_mapping
     for alias, actual_value in repo_mapping['repo_mapping'].items():
         allowed_pushes_raw = allowed_pushes_raw.replace(f'*{alias}', str(actual_value))
 
     # Parse the modified allowed_jfrog_pushes.yml content
     allowed_pushes = yaml.safe_load(allowed_pushes_raw)
 
-    # Write the allowed_jfrog_pushes content directly without additional nesting
+    # Write the final YAML structure to output (without extra nesting)
     with open(output_path, 'w') as f:
         yaml.dump(allowed_pushes, f, default_flow_style=False)
 
-# Function to load the combined YAML
+# Function to load the combined YAML file
 def load_combined_yaml(output_path):
-    # Load the combined YAML file
     with open(output_path, 'r') as f:
-        combined_data = yaml.safe_load(f)  # Load as a single document
-
-    # Return the allowed_jfrog_pushes section (now correctly loaded without extra nesting)
-    return combined_data
+        return yaml.safe_load(f)
 
 # Function to check access using the combined YAML
 def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
-    # Load the combined YAML
     allowed_pushes = load_combined_yaml(combined_yaml_path)
 
-    # Debug output to check the loaded values
+    # Debug output to check loaded values
     print(f"Checking access for JFROG_REPO_NAME: {jfrog_repo_name}")
     print(f"GITHUB_REPO_ID: {github_repo_id}")
     print(f"FOLDER: {folder}")
@@ -47,7 +42,6 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     print(f"Available repositories in allowed_jfrog_pushes: {list(allowed_pushes.keys())}")
 
     # Check if the jfrog_repo_name exists in allowed_jfrog_pushes
-    jfrog_repo_name = jfrog_repo_name.strip()  # Ensure no trailing/leading spaces
     if jfrog_repo_name in allowed_pushes:
         print(f"Repository {jfrog_repo_name} found in allowed_jfrog_pushes.")
         repo_data = allowed_pushes[jfrog_repo_name]
