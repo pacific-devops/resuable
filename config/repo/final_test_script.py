@@ -61,6 +61,8 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
                 print(f"Checking folder: {folder} in {entry['folders']}")
                 if folder in entry["folders"]:
                     return True
+    else:
+        print(f"Repository {jfrog_repo_name} not found in allowed_jfrog_pushes.")
     return False
 
 # Paths to the YAML files
