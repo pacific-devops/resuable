@@ -38,7 +38,7 @@ def load_combined_yaml(output_path):
 def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     allowed_pushes = load_combined_yaml(combined_yaml_path)
 
-    # Check if the jfrog_repo_name exists in allowed_jfrog_pushes
+    # Check if the jfrog_repo_name exists in allowed_pushes
     if jfrog_repo_name in allowed_pushes:
         repo_data = allowed_pushes[jfrog_repo_name]
 
@@ -53,15 +53,15 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
         for entry in repo_data:
             if entry.get("id") == github_repo_id:
                 if folder in entry.get("folders", []):
-                    print("Access granted: GitHub repo has access to the specified JFrog repository and folder.")
+                    print(f"GitHub repo has access to the '{jfrog_repo_name}' and folder '{folder}'.")
                     return
                 else:
-                    print("Access denied: GitHub repo has access to the JFrog repo but not the specified folder.")
+                    print(f"GitHub repo has access to the '{jfrog_repo_name}' but not the folder '{folder}'.")
                     return
         # If we reach here, GitHub repo has no access
-        print("Access denied: GitHub repo does not have access to this JFrog repository.")
+        print(f"GitHub repo does not have access to the '{jfrog_repo_name}'.")
     else:
-        print(f"Access denied: JFrog repository '{jfrog_repo_name}' does not exist.")
+        print(f"JFrog repository '{jfrog_repo_name}' does not exist.")
 
 # Paths to the YAML files
 allowed_pushes_path = "config/repo/allowed_jfrog_pushes.yml"
