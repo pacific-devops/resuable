@@ -13,6 +13,6 @@ jobs:
       - name: Check access
         run: python config/repo/final_test_script.py  # Assuming the script is in the same directory
         env:
-          JFROG_REPO_NAME: gdap-dsale-maven-dev-local
+          JFROG_REPO_NAME: gdap-maven-dev-local
           FOLDER: pace
           GITHUB_REPO_ID: ${{ github.repository_id }}
