@@ -33,12 +33,11 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
 
 # Function to load the combined YAML
 def load_combined_yaml(output_path):
-    # Load the combined YAML file
+    # Load the combined YAML file while the file is still open
     with open(output_path, 'r') as f:
-        combined_data = yaml.safe_load_all(f)  # Load multiple documents
+        combined_data = list(yaml.safe_load_all(f))  # Load multiple documents while file is open
 
     # Extract repo_mapping and allowed_jfrog_pushes from the combined YAML
-    combined_data = list(combined_data)
     repo_mapping = combined_data[0].get("repo_mapping", {})
     allowed_pushes = combined_data[1].get("allowed_jfrog_pushes", {})
     
