@@ -21,8 +21,10 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Parse the modified allowed_jfrog_pushes.yml content
     allowed_pushes = yaml.safe_load(allowed_pushes_raw)
 
-    # Combine the allowed_pushes directly into the final YAML structure without nesting
-    combined_yaml = {**allowed_pushes}  # Directly place allowed_jfrog_pushes data at top level
+    # Combine the allowed_pushes directly into the final YAML structure
+    combined_yaml = {
+        "allowed_jfrog_pushes": allowed_pushes  # Retain 'allowed_jfrog_pushes' key
+    }
 
     # Write the combined structure to a single YAML file
     with open(output_path, 'w') as f:
@@ -34,8 +36,10 @@ def load_combined_yaml(output_path):
     with open(output_path, 'r') as f:
         combined_data = yaml.safe_load(f)  # Load as a single document
 
-    # Return the combined YAML structure directly
-    return combined_data
+    # Extract allowed_jfrog_pushes from the combined YAML
+    allowed_pushes = combined_data.get("allowed_jfrog_pushes", {})
+
+    return allowed_pushes
 
 # Function to check access using the combined YAML
 def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
@@ -49,15 +53,14 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     print(f"Allowed Pushes: {allowed_pushes}")
 
     # Check access logic using the resolved aliases (anchors)
-    for repo_name, repo_data in allowed_pushes.items():
-        print(f"Checking repo: {repo_name}")
-        if repo_name == jfrog_repo_name:
-            for entry in repo_data:
-                print(f"Entry ID: {entry['id']}, Expected: {github_repo_id}")
-                if entry["id"] == github_repo_id:
-                    print(f"Checking folder: {folder} in {entry['folders']}")
-                    if folder in entry["folders"]:
-                        return True
+    if jfrog_repo_name in allowed_pushes:
+        repo_data = allowed_pushes[jfrog_repo_name]
+        for entry in repo_data:
+            print(f"Entry ID: {entry['id']}, Expected: {github_repo_id}")
+            if entry["id"] == github_repo_id:
+                print(f"Checking folder: {folder} in {entry['folders']}")
+                if folder in entry["folders"]:
+                    return True
     return False
 
 # Paths to the YAML files
