@@ -38,42 +38,30 @@ def load_combined_yaml(output_path):
 def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     allowed_pushes = load_combined_yaml(combined_yaml_path)
 
-    # Debug output to check loaded values
-    print(f"Checking access for JFROG_REPO_NAME: {jfrog_repo_name}")
-    print(f"GITHUB_REPO_ID: {github_repo_id}")
-    print(f"FOLDER: {folder}")
-    print(f"Allowed Pushes: {allowed_pushes}")
-    print(f"Available repositories in allowed_jfrog_pushes: {list(allowed_pushes.keys())}")
-
     # Check if the jfrog_repo_name exists in allowed_jfrog_pushes
     if jfrog_repo_name in allowed_pushes:
-        print(f"Repository {jfrog_repo_name} found in allowed_jfrog_pushes.")
         repo_data = allowed_pushes[jfrog_repo_name]
 
         # Type check: Ensure github_repo_id is an integer for comparison
         try:
             github_repo_id = int(github_repo_id)
-            print(f"GITHUB_REPO_ID converted to integer: {github_repo_id}")
         except ValueError:
-            print(f"Error: GITHUB_REPO_ID is not a valid integer: {github_repo_id}")
-            return False
+            print("Error: GITHUB_REPO_ID is not a valid integer.")
+            return
 
         # Loop through the repository data and check the ID and folder
         for entry in repo_data:
-            print(f"Checking entry: {entry}")
             if entry.get("id") == github_repo_id:
-                print(f"ID match found for {github_repo_id}. Checking folders...")
                 if folder in entry.get("folders", []):
-                    print(f"Folder match found: {folder}")
-                    return True
+                    print("Access granted: GitHub repo has access to the specified JFrog repository and folder.")
+                    return
                 else:
-                    print(f"Folder mismatch: {folder} not found in {entry['folders']}")
-            else:
-                print(f"ID mismatch: {entry['id']} does not match {github_repo_id}")
+                    print("Access denied: GitHub repo has access to the JFrog repo but not the specified folder.")
+                    return
+        # If we reach here, GitHub repo has no access
+        print("Access denied: GitHub repo does not have access to this JFrog repository.")
     else:
-        print(f"Repository {jfrog_repo_name} not found in allowed_jfrog_pushes.")
-    
-    return False
+        print(f"Access denied: JFrog repository '{jfrog_repo_name}' does not exist.")
 
 # Paths to the YAML files
 allowed_pushes_path = "config/repo/allowed_jfrog_pushes.yml"
@@ -89,7 +77,4 @@ github_repo_id = os.environ.get("GITHUB_REPO_ID")
 folder = os.environ.get("FOLDER")
 
 # Check access using the combined YAML file
-if check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
-    print("Access granted")
-else:
-    print("Access denied")
+check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path)
