@@ -36,10 +36,8 @@ def load_combined_yaml(output_path):
     with open(output_path, 'r') as f:
         combined_data = yaml.safe_load(f)  # Load as a single document
 
-    # Extract allowed_jfrog_pushes from the combined YAML
-    allowed_pushes = combined_data.get("allowed_jfrog_pushes", {})
-
-    return allowed_pushes
+    # Return the allowed_jfrog_pushes section
+    return combined_data.get("allowed_jfrog_pushes", {})
 
 # Function to check access using the combined YAML
 def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
@@ -52,7 +50,7 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     print(f"FOLDER: {folder}")
     print(f"Allowed Pushes: {allowed_pushes}")
 
-    # Access the actual repositories inside allowed_jfrog_pushes
+    # Now check the actual repositories inside allowed_jfrog_pushes
     repo_data = allowed_pushes.get(jfrog_repo_name, None)
     
     if repo_data:
