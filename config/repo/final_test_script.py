@@ -1,11 +1,11 @@
 import yaml
 import os
 
-# Function to combine two YAML files into one (without nesting the structure)
+# Function to combine two YAML files into one (with manual alias replacement)
 def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Load repo_mapping.yml first
     with open(repo_mapping_path, 'r') as f:
-        repo_mapping = yaml.safe_load(f)
+        repo_mapping = yaml.safe_load(f)  # Load as a single document
 
     # Load allowed_jfrog_pushes.yml as raw text
     with open(allowed_pushes_path, 'r') as f:
@@ -19,14 +19,18 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
         allowed_pushes_raw = allowed_pushes_raw.replace(f'*{alias}', str(actual_value))
 
     # Parse the modified allowed_jfrog_pushes.yml content
-    allowed_pushes = yaml.safe_load(allowed_pushes_raw)
+    allowed_pushes_data = yaml.safe_load(allowed_pushes_raw)
 
-    # Write the final YAML structure to output (without extra nesting)
+    # Since allowed_jfrog_pushes was nested in the file, we extract it directly without wrapping it again
+    allowed_pushes = allowed_pushes_data['allowed_jfrog_pushes']
+
+    # Write the allowed_jfrog_pushes content directly into the final YAML file without nesting
     with open(output_path, 'w') as f:
         yaml.dump(allowed_pushes, f, default_flow_style=False)
 
-# Function to load the combined YAML file
+# Function to load the combined YAML
 def load_combined_yaml(output_path):
+    # Load the combined YAML file
     with open(output_path, 'r') as f:
         return yaml.safe_load(f)
 
