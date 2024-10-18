@@ -2,16 +2,17 @@ import yaml
 import os
 
 def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
-    # Load the allowed_jfrog_pushes.yml as a dictionary
+    # Load allowed_jfrog_pushes.yml as multiple documents if it contains `---`
     with open(allowed_pushes_path, 'r') as f:
-        allowed_pushes = yaml.safe_load(f)
+        allowed_pushes_documents = list(yaml.safe_load_all(f))
 
-    # Load the repo_mapping.yml as a dictionary
+    # Load repo_mapping.yml as multiple documents if it contains `---`
     with open(repo_mapping_path, 'r') as f:
-        repo_mapping = yaml.safe_load(f)
+        repo_mapping_documents = list(yaml.safe_load_all(f))
 
-    # Combine the two dictionaries into one YAML structure
-    combined_yaml = {"repo_mapping": repo_mapping, "allowed_jfrog_pushes": allowed_pushes}
+    # Combine the two sets of documents into one YAML structure
+    combined_yaml = {"repo_mapping": repo_mapping_documents[0]["repo_mapping"], 
+                     "allowed_jfrog_pushes": allowed_pushes_documents[0]["allowed_jfrog_pushes"]}
 
     # Write the combined structure to a single YAML file
     with open(output_path, 'w') as f:
