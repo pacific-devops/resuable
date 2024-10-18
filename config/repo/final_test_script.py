@@ -50,16 +50,31 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     print(f"FOLDER: {folder}")
     print(f"Allowed Pushes: {allowed_pushes}")
 
-    # Now check the actual repositories inside allowed_jfrog_pushes
-    repo_data = allowed_pushes.get(jfrog_repo_name, None)
-    
-    if repo_data:
+    # Check if the jfrog_repo_name exists
+    if jfrog_repo_name in allowed_pushes:
+        print(f"Repository {jfrog_repo_name} found in allowed_jfrog_pushes.")
+        repo_data = allowed_pushes[jfrog_repo_name]
+
+        # Type check: Ensure github_repo_id is an integer for comparison
+        try:
+            github_repo_id = int(github_repo_id)
+            print(f"GITHUB_REPO_ID converted to integer: {github_repo_id}")
+        except ValueError:
+            print(f"Error: GITHUB_REPO_ID is not a valid integer: {github_repo_id}")
+            return False
+
+        # Loop through the repository data and check the ID and folder
         for entry in repo_data:
-            print(f"Entry ID: {entry['id']}, Expected: {github_repo_id}")
-            if entry["id"] == github_repo_id:
-                print(f"Checking folder: {folder} in {entry['folders']}")
-                if folder in entry["folders"]:
+            print(f"Checking entry: {entry}")
+            if entry.get("id") == github_repo_id:
+                print(f"ID match found for {github_repo_id}. Checking folders...")
+                if folder in entry.get("folders", []):
+                    print(f"Folder match found: {folder}")
                     return True
+                else:
+                    print(f"Folder mismatch: {folder} not found in {entry['folders']}")
+            else:
+                print(f"ID mismatch: {entry['id']} does not match {github_repo_id}")
     else:
         print(f"Repository {jfrog_repo_name} not found in allowed_jfrog_pushes.")
     
