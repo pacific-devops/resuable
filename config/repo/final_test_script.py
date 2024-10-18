@@ -49,8 +49,10 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     print(f"GITHUB_REPO_ID: {github_repo_id}")
     print(f"FOLDER: {folder}")
     print(f"Allowed Pushes: {allowed_pushes}")
+    print(f"Available repositories in allowed_jfrog_pushes: {list(allowed_pushes.keys())}")
 
-    # Check if the jfrog_repo_name exists
+    # Check if the jfrog_repo_name exists in allowed_jfrog_pushes
+    jfrog_repo_name = jfrog_repo_name.strip()  # Ensure no trailing/leading spaces
     if jfrog_repo_name in allowed_pushes:
         print(f"Repository {jfrog_repo_name} found in allowed_jfrog_pushes.")
         repo_data = allowed_pushes[jfrog_repo_name]
