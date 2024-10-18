@@ -7,7 +7,7 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     with open(repo_mapping_path, 'r') as f:
         repo_mapping = yaml.safe_load(f)  # Load as a single document
 
-    # Load allowed_jfrog_pushes.yml as raw text (contains ---)
+    # Load allowed_jfrog_pushes.yml as raw text
     with open(allowed_pushes_path, 'r') as f:
         allowed_pushes_raw = f.read()
 
@@ -21,11 +21,8 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Now parse the modified allowed_jfrog_pushes.yml content
     allowed_pushes = yaml.safe_load(allowed_pushes_raw)
 
-    # Combine the two dictionaries into one YAML structure
-    combined_yaml = {
-        "repo_mapping": repo_mapping['repo_mapping'],
-        **allowed_pushes  # Flatten the structure
-    }
+    # Flatten the allowed_pushes and repo_mapping into a single document
+    combined_yaml = {**allowed_pushes}  # This will flatten allowed_jfrog_pushes structure
 
     # Write the combined structure to a single YAML file
     with open(output_path, 'w') as f:
@@ -37,23 +34,19 @@ def load_combined_yaml(output_path):
     with open(output_path, 'r') as f:
         combined_data = yaml.safe_load(f)  # Load as a single document
 
-    # Extract repo_mapping and allowed_jfrog_pushes from the combined YAML
-    repo_mapping = combined_data.get("repo_mapping", {})
-    allowed_pushes = {k: v for k, v in combined_data.items() if k != "repo_mapping"}
-
-    return allowed_pushes, repo_mapping
+    # No nested 'allowed_jfrog_pushes' key, directly return combined_data
+    return combined_data
 
 # Function to check access using the combined YAML
 def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     # Load the combined YAML
-    allowed_pushes, repo_mapping = load_combined_yaml(combined_yaml_path)
+    allowed_pushes = load_combined_yaml(combined_yaml_path)
 
     # Debug output to check the loaded values
     print(f"Checking access for JFROG_REPO_NAME: {jfrog_repo_name}")
     print(f"GITHUB_REPO_ID: {github_repo_id}")
     print(f"FOLDER: {folder}")
     print(f"Allowed Pushes: {allowed_pushes}")
-    print(f"Repo Mapping: {repo_mapping}")
 
     # Check access logic using the resolved aliases (anchors)
     for repo_name, repo_data in allowed_pushes.items():
