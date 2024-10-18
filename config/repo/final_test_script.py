@@ -24,7 +24,7 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Combine the two dictionaries into one YAML structure
     combined_yaml = {
         "repo_mapping": repo_mapping['repo_mapping'],
-        "allowed_jfrog_pushes": allowed_pushes
+        "allowed_jfrog_pushes": allowed_pushes  # We store the data directly
     }
 
     # Write the combined structure to a single YAML file
