@@ -1,5 +1,50 @@
+import yaml
 import os
 
+# Function to combine two YAML files into one (with manual alias replacement)
+def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
+    # Load repo_mapping.yml first (it may contain --- separator)
+    with open(repo_mapping_path, 'r') as f:
+        repo_mapping_documents = list(yaml.safe_load_all(f))  # Handle multiple YAML documents
+
+    # We assume the first document is the repo_mapping structure
+    repo_mapping = repo_mapping_documents[0]['repo_mapping']
+
+    # Load allowed_jfrog_pushes.yml as raw text (contains ---)
+    with open(allowed_pushes_path, 'r') as f:
+        allowed_pushes_raw = f.read()
+
+    # Remove the '---' document separator if present in the second document
+    allowed_pushes_raw = allowed_pushes_raw.replace('---\n', '')
+
+    # Manually replace the aliases with their corresponding values from repo_mapping
+    for alias, actual_value in repo_mapping.items():
+        allowed_pushes_raw = allowed_pushes_raw.replace(f'*{alias}', str(actual_value))
+
+    # Now parse the modified allowed_jfrog_pushes.yml content
+    allowed_pushes = yaml.safe_load(allowed_pushes_raw)
+
+    # Combine the two dictionaries into one YAML structure
+    combined_yaml = {"repo_mapping": repo_mapping, "allowed_jfrog_pushes": allowed_pushes}
+
+    # Write the combined structure to a single YAML file
+    with open(output_path, 'w') as f:
+        yaml.dump(combined_yaml, f, default_flow_style=False)
+
+# Function to load the combined YAML
+def load_combined_yaml(output_path):
+    # Load the combined YAML file
+    with open(output_path, 'r') as f:
+        combined_data = yaml.safe_load_all(f)  # Load multiple documents
+
+    # Extract repo_mapping and allowed_jfrog_pushes from the combined YAML
+    combined_data = list(combined_data)
+    repo_mapping = combined_data[0].get("repo_mapping", {})
+    allowed_pushes = combined_data[1].get("allowed_jfrog_pushes", {})
+    
+    return allowed_pushes, repo_mapping
+
+# Function to check access using the combined YAML
 def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     # Load the combined YAML
     allowed_pushes, repo_mapping = load_combined_yaml(combined_yaml_path)
@@ -27,6 +72,9 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
 allowed_pushes_path = "config/repo/allowed_jfrog_pushes.yml"
 repo_mapping_path = "config/repo/repo_mapping.yml"
 combined_yaml_path = "config/repo/combined.yml"
+
+# Combine the two YAML files into one document
+combine_yaml_files(allowed_pushes_path, repo_mapping_path, combined_yaml_path)
 
 # Example usage (from GitHub Actions environment)
 jfrog_repo_name = os.environ.get("JFROG_REPO_NAME")
