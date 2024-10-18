@@ -21,8 +21,8 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Parse the modified allowed_jfrog_pushes.yml content
     allowed_pushes = yaml.safe_load(allowed_pushes_raw)
 
-    # Combine the allowed_pushes directly into the final YAML structure
-    combined_yaml = allowed_pushes  # No extra nesting
+    # Combine the allowed_pushes directly into the final YAML structure without nesting
+    combined_yaml = {**allowed_pushes}  # Directly place allowed_jfrog_pushes data at top level
 
     # Write the combined structure to a single YAML file
     with open(output_path, 'w') as f:
