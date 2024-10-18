@@ -52,9 +52,10 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
     print(f"FOLDER: {folder}")
     print(f"Allowed Pushes: {allowed_pushes}")
 
-    # Check access logic using the resolved aliases (anchors)
-    if jfrog_repo_name in allowed_pushes:
-        repo_data = allowed_pushes[jfrog_repo_name]
+    # Access the actual repositories inside allowed_jfrog_pushes
+    repo_data = allowed_pushes.get(jfrog_repo_name, None)
+    
+    if repo_data:
         for entry in repo_data:
             print(f"Entry ID: {entry['id']}, Expected: {github_repo_id}")
             if entry["id"] == github_repo_id:
@@ -63,6 +64,7 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
                     return True
     else:
         print(f"Repository {jfrog_repo_name} not found in allowed_jfrog_pushes.")
+    
     return False
 
 # Paths to the YAML files
