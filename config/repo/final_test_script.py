@@ -3,9 +3,9 @@ import os
 
 # Function to combine two YAML files into one (with manual alias replacement)
 def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
-    # Load repo_mapping.yml first (it may contain --- separator)
+    # Load repo_mapping.yml first
     with open(repo_mapping_path, 'r') as f:
-        repo_mapping = yaml.safe_load(f)  # Load as single document
+        repo_mapping = yaml.safe_load(f)  # Load as a single document
 
     # Load allowed_jfrog_pushes.yml as raw text (contains ---)
     with open(allowed_pushes_path, 'r') as f:
@@ -24,7 +24,7 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Combine the two dictionaries into one YAML structure
     combined_yaml = {
         "repo_mapping": repo_mapping['repo_mapping'],
-        "allowed_jfrog_pushes": allowed_pushes  # We store the data directly
+        "allowed_jfrog_pushes": allowed_pushes  # Correct structure
     }
 
     # Write the combined structure to a single YAML file
@@ -35,7 +35,7 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
 def load_combined_yaml(output_path):
     # Load the combined YAML file
     with open(output_path, 'r') as f:
-        combined_data = yaml.safe_load(f)  # Load as a single document, no longer as multiple
+        combined_data = yaml.safe_load(f)  # Load as a single document
 
     # Extract repo_mapping and allowed_jfrog_pushes from the combined YAML
     repo_mapping = combined_data.get("repo_mapping", {})
