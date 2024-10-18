@@ -53,13 +53,13 @@ def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
         for entry in repo_data:
             if entry.get("id") == github_repo_id:
                 if folder in entry.get("folders", []):
-                    print(f"GitHub repo has access to the '{jfrog_repo_name}' and folder '{folder}'.")
+                    print(f"GitHub repo ID {github_repo_id} has access to the '{jfrog_repo_name}' and folder '{folder}'.")
                     return
                 else:
-                    print(f"GitHub repo has access to the '{jfrog_repo_name}' but not the folder '{folder}'.")
+                    print(f"GitHub repo ID {github_repo_id} has access to the '{jfrog_repo_name}' but not the folder '{folder}'.")
                     return
         # If we reach here, GitHub repo has no access
-        print(f"GitHub repo does not have access to the '{jfrog_repo_name}'.")
+        print(f"GitHub repo ID {github_repo_id} does not have access to the '{jfrog_repo_name}'.")
     else:
         print(f"JFrog repository '{jfrog_repo_name}' does not exist.")
 
