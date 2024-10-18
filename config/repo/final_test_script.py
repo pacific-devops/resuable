@@ -21,14 +21,9 @@ def combine_yaml_files(allowed_pushes_path, repo_mapping_path, output_path):
     # Parse the modified allowed_jfrog_pushes.yml content
     allowed_pushes = yaml.safe_load(allowed_pushes_raw)
 
-    # Combine the allowed_pushes directly into the final YAML structure
-    combined_yaml = {
-        "allowed_jfrog_pushes": allowed_pushes  # Retain 'allowed_jfrog_pushes' key
-    }
-
-    # Write the combined structure to a single YAML file
+    # Write the allowed_jfrog_pushes content directly without additional nesting
     with open(output_path, 'w') as f:
-        yaml.dump(combined_yaml, f, default_flow_style=False)
+        yaml.dump(allowed_pushes, f, default_flow_style=False)
 
 # Function to load the combined YAML
 def load_combined_yaml(output_path):
@@ -36,8 +31,8 @@ def load_combined_yaml(output_path):
     with open(output_path, 'r') as f:
         combined_data = yaml.safe_load(f)  # Load as a single document
 
-    # Return the allowed_jfrog_pushes section
-    return combined_data.get("allowed_jfrog_pushes", {})
+    # Return the allowed_jfrog_pushes section (now correctly loaded without extra nesting)
+    return combined_data
 
 # Function to check access using the combined YAML
 def check_access(jfrog_repo_name, github_repo_id, folder, combined_yaml_path):
