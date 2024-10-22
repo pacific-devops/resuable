@@ -18,4 +18,5 @@ jobs:
           echo "Generated artifact name: $ARTIFACT_NAME"
 
       - name: Debug Artifact Name
-        run: echo 'Artifact name is: ${{ steps.generate.outputs.artifact_name }}'
+        run: |
+          echo 'Artifact name is: ${{ steps.generate.outputs.artifact_name }}'
