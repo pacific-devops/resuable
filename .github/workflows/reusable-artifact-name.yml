@@ -2,6 +2,10 @@ name: Reusable Workflow - Generate Artifact Name
 
 on:
   workflow_call:
+    outputs:
+      artifact_name:
+        description: 'The generated artifact name'
+        value: ${{ jobs.generate-artifact.outputs.artifact_name }}  # Link the job output to the workflow_call output
 
 jobs:
   generate-artifact:
