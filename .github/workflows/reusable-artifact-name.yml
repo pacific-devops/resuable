@@ -1,0 +1,21 @@
+name: Reusable Workflow - Generate Artifact Name
+
+on:
+  workflow_call:
+
+jobs:
+  generate-artifact:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_name: ${{ steps.generate.outputs.artifact_name }}  # Define output
+
+    steps:
+      - name: Generate Artifact Name
+        id: generate
+        run: |
+          ARTIFACT_NAME="artifact-$(date +%s)"
+          echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+          echo "Generated artifact name: $ARTIFACT_NAME"
+
+      - name: Debug Artifact Name
+        run: echo "Artifact name is: ${{ steps.generate.outputs.artifact_name }}"
